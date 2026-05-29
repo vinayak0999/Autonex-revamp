@@ -323,7 +323,7 @@ export default function HeroScene() {
               <div>
                 <h1 className="text-3xl sm:text-5xl md:text-7xl font-black leading-[1.1] tracking-tighter mb-6">
                   <span className="block overflow-hidden">
-                    <span ref={line1Ref} className="block text-white">AI AGENTS &amp; DATA INFRA</span>
+                    <span ref={line1Ref} className="block text-white">AI PRODUCTS</span>
                   </span>
                   <span className="block overflow-hidden">
                     <span

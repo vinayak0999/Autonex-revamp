@@ -330,7 +330,7 @@ export default function IndustrialHero() {
               </div>
               <div>
                 <h1 className="text-3xl sm:text-5xl md:text-7xl font-black leading-tight tracking-tighter mb-6">
-                  <span className="block">AI AGENTS & DATA INFRA</span>
+                  <span className="block">AI PRODUCTS</span>
                   <span className="block text-secondary">FOR SMARTER INDUSTRIAL SYSTEMS</span>
                 </h1>
               </div>
