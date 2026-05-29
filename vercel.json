@@ -15,7 +15,15 @@
       "dest": "/assets/$1"
     },
     {
+      "src": "/videos/(.*)",
+      "dest": "/videos/$1"
+    },
+    {
       "src": "/(.*\\.(png|jpg|jpeg|gif|svg|ico|webp))",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*\\.(mp4|mov|webm|ogg))",
       "dest": "/$1"
     },
     {

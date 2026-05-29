@@ -586,48 +586,7 @@ export default function PainPoints() {
                     <span className="text-[9px] font-black tracking-widest uppercase block mb-1" style={{ color: step.solution.color }}>✦ Proof</span>
                     <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>{step.solution.proof}</p>
                   </div>
-
-                  {/* ── Video demo — only for steps with a video field ─────── */}
-                  {step.solution.video && (
-                    <div className="mt-5">
-                      {/* Live indicator label */}
-                      <div className="flex items-center gap-2 mb-2">
-                        <div style={{
-                          width: 6, height: 6, borderRadius: "50%",
-                          background: step.solution.color,
-                          boxShadow: `0 0 8px ${step.solution.color}`,
-                          animation: "stepPulse 1.8s ease-in-out infinite",
-                        }} />
-                        <span style={{
-                          fontSize: "0.6rem", fontWeight: 800,
-                          letterSpacing: "0.2em", textTransform: "uppercase" as const,
-                          color: step.solution.color,
-                        }}>
-                          Live Demo
-                        </span>
-                      </div>
-
-                      {/* Video */}
-                      <div style={{
-                        borderRadius: 12, overflow: "hidden",
-                        border: `1px solid ${step.solution.color}38`,
-                        boxShadow: `0 8px 32px rgba(0,0,0,0.55), 0 0 24px ${step.solution.color}18`,
-                        background: "#000",
-                        position: "relative",
-                      }}>
-                        <video
-                          src={step.solution.video}
-                          autoPlay
-                          muted
-                          loop
-                          playsInline
-                          controls
-                          style={{ width: "100%", display: "block", maxHeight: 220, objectFit: "cover" }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  </div>
 
               </div>{/* end row grid */}
 
