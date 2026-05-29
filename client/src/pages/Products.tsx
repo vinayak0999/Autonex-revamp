@@ -51,7 +51,7 @@ const products = [
     icon: MapPin,
     name: "WIL",
     fullName: "Warehouse Intelligence & Logistics",
-    tagline: "Google Maps for your warehouse. Find any item in seconds.",
+    tagline: "Navigation Maps for your warehouse. Find any item in seconds.",
     description:
       "WIL gives every item in your warehouse a precise, live location — accurate to 5cm. Forklifts navigate turn-by-turn to the item. Workers search on mobile and go straight there. No more roaming, no more guessing.",
     detections: [

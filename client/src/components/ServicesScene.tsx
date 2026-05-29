@@ -36,7 +36,7 @@ const PRODUCTS = [
     fullName: "Warehouse Intelligence & Logistics",
     color:    "#2dd4bf",
     accuracy: "5cm location accuracy",
-    headline: "Google Maps. But for your warehouse.\nAt 5cm accuracy.",
+    headline: "Navigation Maps. But for your warehouse.\nAt 5cm accuracy.",
     tagline:  "No more hunting by memory. Search any reel, location on screen in seconds, forklift navigated straight to it.",
     subtext:  "",
     video:    "/videos/wil.mp4",
