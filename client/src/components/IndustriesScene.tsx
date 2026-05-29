@@ -175,6 +175,8 @@ export default function IndustriesScene() {
   // ── Advance to next card ────────────────────────────────────────────────
   const advance = useCallback(() => {
     if (!sliderRef.current) return;
+    // Hide info panel BEFORE state change so old content never flashes
+    if (infoRef.current) gsap.set(infoRef.current, { opacity: 0, y: 8 });
     // 1. Capture current DOM positions BEFORE state change
     const cards = sliderRef.current.querySelectorAll<HTMLElement>(".ind-card");
     flipRef.current = Flip.getState(cards);
@@ -191,11 +193,13 @@ export default function IndustriesScene() {
   useLayoutEffect(() => {
     if (!flipRef.current || !sliderRef.current) return;
     const cards = sliderRef.current.querySelectorAll<HTMLElement>(".ind-card");
+    const isMob = window.innerWidth < 640;
     Flip.from(flipRef.current, {
       targets: cards,
       ease: "expo.inOut",
-      duration: 0.82,
-      stagger: { amount: 0.12, from: "end" },
+      // Shorter on mobile — less janky, faster to settle
+      duration: isMob ? 0.52 : 0.82,
+      stagger: { amount: isMob ? 0.06 : 0.12, from: "end" },
       onEnter: (els) =>
         gsap.from(els, { opacity: 0, y: 18, duration: 0.35, ease: "expo.out" }),
       onLeave: (els) =>
@@ -213,10 +217,11 @@ export default function IndustriesScene() {
   // ── Animate info panel on card change ──────────────────────────────────
   useEffect(() => {
     if (!infoRef.current) return;
+    // Small delay so info fades in AFTER Flip starts (not simultaneously)
     gsap.fromTo(
       infoRef.current,
       { opacity: 0, y: 12 },
-      { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }
+      { opacity: 1, y: 0, duration: 0.42, ease: "power3.out", delay: 0.15 }
     );
   }, [frontIdx]);
 

@@ -264,23 +264,53 @@ export default function ServicesScene() {
 
     const goTo = (idx: number, dir: 1 | -1 = 1) => {
       if (transitingRef.current) return;
-      activeIdxRef.current = idx;
-      setActive(idx);
-      playVideo(idx);
-      // Slide content in from appropriate direction
-      if (contentRef.current) {
-        gsap.fromTo(
-          contentRef.current.querySelectorAll('.psc-item'),
-          { x: dir > 0 ? 40 : -40, opacity: 0 },
-          { x: 0, opacity: 1, stagger: 0.05, duration: 0.4, ease: 'power3.out' }
-        );
-      }
-      if (frameRef.current) {
-        gsap.fromTo(frameRef.current,
-          { opacity: 0.65, scale: 0.96 },
-          { opacity: 1, scale: 1, duration: 0.4, ease: 'power3.out' }
-        );
-      }
+      transitingRef.current = true; // lock: was missing — multiple overlapping transitions possible without this
+
+      const items = contentRef.current
+        ? Array.from(contentRef.current.querySelectorAll<HTMLElement>('.psc-item'))
+        : [];
+
+      // Step 1: fade OLD content out (direction-aware)
+      gsap.to(items.length ? items : [], {
+        x: dir > 0 ? -28 : 28,
+        opacity: 0,
+        stagger: 0.02,
+        duration: 0.18,
+        ease: 'power2.in',
+        onComplete: () => {
+          // Step 2: swap state AFTER old content is invisible → no flash
+          activeIdxRef.current = idx;
+          setActive(idx);
+          playVideo(idx);
+
+          // Step 3: frame pulse
+          if (frameRef.current) {
+            gsap.fromTo(frameRef.current,
+              { opacity: 0.6, scale: 0.96 },
+              { opacity: 1, scale: 1, duration: 0.38, ease: 'power3.out' }
+            );
+          }
+
+          // Step 4: fade NEW content in — rAF ensures React has committed new DOM
+          requestAnimationFrame(() => {
+            const newItems = contentRef.current
+              ? contentRef.current.querySelectorAll<HTMLElement>('.psc-item')
+              : null;
+            if (newItems && newItems.length) {
+              gsap.fromTo(
+                newItems,
+                { x: dir > 0 ? 28 : -28, opacity: 0 },
+                {
+                  x: 0, opacity: 1, stagger: 0.04, duration: 0.34, ease: 'power3.out',
+                  onComplete: () => { transitingRef.current = false; },
+                }
+              );
+            } else {
+              transitingRef.current = false;
+            }
+          });
+        },
+      });
     };
 
     const scheduleNext = () => {
