@@ -345,7 +345,7 @@ export default function HeroScene() {
 
               {/* Sub */}
               <p ref={subRef} className="text-lg md:text-xl max-w-4xl mx-auto leading-relaxed mb-10 hero-parallax" style={{ color: "rgba(255,255,255,0.65)" }}>
-                We combine machine-level optimization with domain-specific intelligence to automate decisions, enhance transparency, and create datasets that fuel the next generation of robotics.
+               We build AI powered deeptech products for automation and observability, with multiple patented products live to improve operations in the factories
               </p>
 
               {/* CTAs */}

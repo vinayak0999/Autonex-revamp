@@ -339,7 +339,14 @@ function ProductBlock({
             >
               {product.setup}
             </span>
-            <span className="text-xs font-medium px-4 py-2 rounded-full border border-white/10 text-foreground/45 bg-white/5">
+            <span
+              className="text-xs font-medium px-4 py-2 rounded-full border"
+              style={{
+                color: `${product.color}cc`,
+                borderColor: `${product.color}25`,
+                background: `${product.color}08`,
+              }}
+            >
               {product.cost}
             </span>
           </div>
@@ -363,13 +370,42 @@ function ProductBlock({
             </p>
           </div>
 
-          {/* Case study */}
-          <div className="rounded-2xl p-5 border border-white/5 bg-white/[0.02] mb-8">
-            <p className="text-xs uppercase tracking-widest font-bold text-foreground/30 mb-2">
-              Case Study — {product.industry}
-            </p>
-            <p className="text-foreground/55 text-sm leading-relaxed italic">
-              "{product.caseStudy}"
+          {/* Case study — highlighted */}
+          <div
+            className="rounded-2xl p-5 border mb-8 relative overflow-hidden"
+            style={{
+              borderColor: `${product.color}45`,
+              background: `linear-gradient(135deg, ${product.color}12 0%, rgba(6,10,25,0.7) 100%)`,
+              boxShadow: `0 4px 24px ${product.color}12, inset 0 1px 0 ${product.color}20`,
+            }}
+          >
+            {/* Top accent bar */}
+            <div style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: 2,
+              background: `linear-gradient(90deg, ${product.color}, transparent 70%)`,
+              borderRadius: "12px 12px 0 0",
+            }} />
+
+            {/* Label + large quote icon */}
+            <div className="flex items-center justify-between mb-3">
+              <p
+                className="text-[10px] uppercase tracking-widest font-black"
+                style={{ color: product.color }}
+              >
+                ✦ Case Study — {product.industry}
+              </p>
+              <span
+                className="text-4xl font-black leading-none select-none"
+                style={{ color: product.color, opacity: 0.18, fontFamily: "Georgia, serif" }}
+              >
+                &ldquo;
+              </span>
+            </div>
+
+            <p className="text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.72)" }}>
+              <span style={{ color: product.color, fontWeight: 700 }}>&ldquo;</span>
+              {product.caseStudy}
+              <span style={{ color: product.color, fontWeight: 700 }}>&rdquo;</span>
             </p>
           </div>
 
@@ -379,8 +415,8 @@ function ProductBlock({
             id={`cta-${product.id}`}
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 hover:shadow-xl text-white"
             style={{
-              background: "linear-gradient(135deg, #62AADE, #163791)",
-              boxShadow: "0 0 20px rgba(22, 55, 145, 0.3)",
+              background: `linear-gradient(135deg, ${product.color}, #163791)`,
+              boxShadow: `0 0 24px ${product.color}40`,
             }}
           >
             Book a Free Pilot <ArrowRight className="w-4 h-4" />
@@ -433,7 +469,7 @@ export default function Products() {
               </h1>
               <p className="text-xl text-foreground/55 max-w-2xl mx-auto leading-relaxed">
                 Start with the product that solves your biggest pain. Each
-                module is standalone prove ROI before expanding.
+                module is standalone — prove ROI before expanding.
               </p>
             </motion.div>
 

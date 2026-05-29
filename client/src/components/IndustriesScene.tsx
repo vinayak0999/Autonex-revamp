@@ -404,7 +404,7 @@ export default function IndustriesScene() {
               fontSize: 11, fontWeight: 700, letterSpacing: "0.1em",
               textTransform: "uppercase", color: current.color, marginBottom: 14,
             }}>
-              {String(order.indexOf(frontIdx) + 1).padStart(2, "0")} / {String(industries.length).padStart(2, "0")}
+              {String(frontIdx + 1).padStart(2, "0")} / {String(industries.length).padStart(2, "0")}
             </div>
 
             {/* Industry name */}

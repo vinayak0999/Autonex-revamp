@@ -336,7 +336,7 @@ export default function IndustrialHero() {
               </div>
               <div>
                 <p className="text-lg md:text-xl max-w-4xl mx-auto leading-relaxed text-zinc-300 mb-10">
-                  We combine machine-level optimization with domain-specific intelligence to automate decisions, enhance transparency, and create datasets that fuel the next generation of robotics.
+                  We build AI powered deeptech products for automation and observability, with multiple patented products live to improve operations in the factories
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
