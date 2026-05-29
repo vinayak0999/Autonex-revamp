@@ -262,7 +262,7 @@ export default function IndustriesScene() {
         <SectionHeader
           eyebrow="Industries We Serve"
           title="Built for every factory floor."
-          subtitle="Click through to explore how Autonex powers each industry with custom AI — not off-the-shelf software."
+          subtitle="Click through to explore how Autonex powers each industry with custom AI, not off-the-shelf software."
         />
       </SlideIn>
 
@@ -415,7 +415,7 @@ export default function IndustriesScene() {
             {/* Description */}
             <p style={{ color: "rgba(255,255,255,0.48)", fontSize: 15, lineHeight: 1.65, marginBottom: 28 }}>
               Autonex deploys custom-trained AI models for{" "}
-              {current.name.toLowerCase()} — running on your existing cameras, sensors, and ERP without disruption.
+              {current.name.toLowerCase()}, running on your existing cameras, sensors, and ERP without disruption.
             </p>
 
             {/* Stat highlight */}

@@ -10,6 +10,8 @@ const Home = lazy(() => import("@/pages/Home"));
 const Products = lazy(() => import("@/pages/Products"));
 const About = lazy(() => import("@/pages/About"));
 const NewContact = lazy(() => import("@/pages/NewContact"));
+const TermsOfService = lazy(() => import("@/pages/TermsOfService"));
+const PrivacyPolicy = lazy(() => import("@/pages/PrivacyPolicy"));
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 import { initLenis } from "./lib/lenis";
@@ -26,6 +28,8 @@ function Router() {
       <Route path="/products" component={Products} />
       <Route path="/about" component={About} />
       <Route path="/contact" component={NewContact} />
+      <Route path="/terms" component={TermsOfService} />
+      <Route path="/privacy" component={PrivacyPolicy} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import { gsap } from "@/lib/gsap";
 import { ScrollTrigger } from "@/lib/gsap";
-import { CheckCircle2, Zap, ShieldCheck, MapPin, GitBranch, ClipboardList } from "lucide-react";
+import { CheckCircle2, Zap, ShieldCheck, MapPin, GitBranch, ClipboardList, Sparkles } from "lucide-react";
 
 // ─── Product data ─────────────────────────────────────────────────────────────
 const PRODUCTS = [
@@ -12,7 +12,10 @@ const PRODUCTS = [
     name:     "V.I.G.I.L",
     fullName: "Visual Intelligence & Guard Inspection Layer",
     color:    "#60a5fa",
-    tagline:  "See every safety risk in real time, on your existing cameras.",
+    accuracy: "99.4% detection accuracy",
+    headline: "Your cameras are watching.\nBut are they thinking?",
+    tagline:  "Your factory is already generating data. VIGIL makes it intelligent: safety, compliance, dispatch, output tracking and machine monitoring, running 24/7 on the cameras you already have.",
+    subtext:  "Zero paperwork. Zero transcription errors. Go live in days, not months.",
     video:    "/videos/vigil.mp4",
     quickWin: "Live in 1 week",
     features: [
@@ -23,7 +26,7 @@ const PRODUCTS = [
       "5S / housekeeping compliance",
       "Full audit trail: photo + timestamp + severity",
     ],
-    result: "50% drop in safety incidents — first month",
+    result: "50% drop in safety incidents in the first month",
   },
   {
     id:       "wil",
@@ -32,15 +35,18 @@ const PRODUCTS = [
     name:     "WIL",
     fullName: "Warehouse Intelligence & Logistics",
     color:    "#2dd4bf",
-    tagline:  "Google Maps for your warehouse. 5cm item location accuracy.",
+    accuracy: "5cm location accuracy",
+    headline: "Google Maps. But for your warehouse.\nAt 5cm accuracy.",
+    tagline:  "No more hunting by memory. Search any reel, location on screen in seconds, forklift navigated straight to it.",
+    subtext:  "",
     video:    "/videos/wil.mp4",
     quickWin: "Live in 3 weeks",
     features: [
-      "5cm item location accuracy",
-      "Turn-by-turn forklift HMI navigation",
-      "Auto-links weight via camera",
-      "1-week ERP integration (SAP, Oracle, Tally)",
-      "Works across shifts & teams",
+      "No more hunting by memory. Search any reel, location on screen in seconds.",
+      "Location updates on every pick & drop. Map syncs the instant your forklift moves.",
+      "ERP updated automatically. Job card, weighment & location logged after every run.",
+      "QR tagged on inward. 1-week ERP integration (SAP, Oracle, Tally).",
+      "Works across shifts & teams without retraining",
       "Cycle counts in minutes, not days",
     ],
     result: "Stock retrieval time down 70% in first month",
@@ -50,20 +56,23 @@ const PRODUCTS = [
     step:     "03",
     icon:     GitBranch,
     name:     "Digital Twin",
-    fullName: "Virtual replica of your factory — finds hidden capacity",
+    fullName: "Patent-published simulation engine. Finds hidden capacity.",
     color:    "#a78bfa",
-    tagline:  "Test hundreds of scenarios in minutes. Find what's costing you throughput.",
+    accuracy: "200+ scenarios per simulation run",
+    headline: "More output. Zero new machines.\nOne click to approve.",
+    tagline:  "A virtual replica of your factory, running simulations in real time, scoring hundreds of scenarios, and telling you exactly what to change to unlock hidden capacity.",
+    subtext:  "",
     video:    "/videos/twin.mov",
-    quickWin: "POC in 6–8 weeks",
+    quickWin: "POC in 6-8 weeks",
     features: [
-      "Patent-published simulation algorithm (IIT Bombay)",
-      "Deployed at Mahindra & John Deere",
-      "Mirror → Simulate → Score → Recommend",
-      "Zero capex — no new machines",
-      "Live-connected to shop floor data",
-      "Tests hundreds of scenarios in minutes",
+      "Mirror your shop floor. Precise virtual model built using your live machine data.",
+      "Run 200+ simulations in minutes. What used to take weeks now takes less time than making chai.",
+      '"Do X → +12% output, −18% WIP, −2 hrs delay." One click to approve.',
+      "Zero capex. No new machines required.",
+      "Live-connected to shop floor telemetry",
+      "Patent-published algorithm, deployed at Mahindra & John Deere",
     ],
-    result: "+4% daily throughput — guaranteed",
+    result: "+4% daily throughput, guaranteed",
   },
   {
     id:       "erp",
@@ -72,16 +81,19 @@ const PRODUCTS = [
     name:     "AI ERP / eBMR",
     fullName: "Auto-capture. Always audit-ready.",
     color:    "#38bdf8",
-    tagline:  "Eliminate manual entry. Pull an audit package in minutes, not days.",
+    accuracy: "99.9% documentation accuracy",
+    headline: "",
+    tagline:  "Eliminate manual entry. Pull a full audit package in minutes, not days.",
+    subtext:  "",
     video:    "/videos/ebmr.mov",
     quickWin: "Dispatch live in 1 day",
     features: [
-      "Auto-capture via cameras & sensors — no paper",
+      "Auto-capture via cameras & sensors. No paper.",
       "Deviations flagged and logged in real time",
       "Full audit package in minutes, not days",
       "SAP · Oracle · Tally · Standalone integration",
       "Mobile app for shop floor operators",
-      "99.9% dispatch accuracy — 1-day setup",
+      "99.9% dispatch accuracy. 1-day setup.",
     ],
     result: "99%+ accuracy. Zero tally mismatches.",
   },
@@ -274,16 +286,19 @@ export default function ServicesScene() {
           50%       { opacity: 1; }
         }
         .sv-corner { animation: svCornerPulse 2.2s ease-in-out infinite; }
+        @keyframes rotateAurora { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
       `}</style>
 
       {/* ── Section heading — scrolls normally, NOT pinned ──────────────── */}
       <div className="sv-header text-center px-6 pt-28 pb-4">
-        <p
-          className="text-[11px] font-black tracking-[0.28em] uppercase mb-4"
-          style={{ color: PRODUCTS[active].color, transition: "color 0.45s" }}
-        >
-          Our Products
-        </p>
+        {/* Aurora badge */}
+        <div className="relative inline-flex items-center justify-center p-[1.5px] mb-6 overflow-hidden rounded-full">
+          <div className="absolute top-1/2 left-1/2 w-[200%] h-[400%]" style={{ background: "conic-gradient(from 0deg at 50% 50%, rgba(98,170,222,0.6), rgba(22,55,145,0.2), rgba(98,170,222,0.6))", animation: "rotateAurora 4s linear infinite" }} />
+          <div className="relative flex items-center px-5 py-2.5 rounded-full" style={{ background: "rgba(6,13,31,0.9)", backdropFilter: "blur(12px)" }}>
+            <Sparkles className="w-3.5 h-3.5 mr-2" style={{ color: "#62AADE" }} />
+            <span className="text-xs font-semibold tracking-[0.2em] uppercase text-white">Our Products</span>
+          </div>
+        </div>
         <h2
           className="text-4xl sm:text-5xl lg:text-[4.5rem] font-black text-white leading-[1.05]"
           style={{ letterSpacing: "-0.025em" }}
@@ -388,8 +403,10 @@ export default function ServicesScene() {
                   />
                 ))}
 
-                {/* Scanlines */}
-                <div className="sv-scanlines absolute inset-0 z-10 pointer-events-none opacity-35" />
+                {/* Scanlines — cinematic on VIGIL & WIL only */}
+                {(p.id === "vigil" || p.id === "wil") && (
+                  <div className="sv-scanlines absolute inset-0 z-10 pointer-events-none opacity-35" />
+                )}
 
                 {/* Gloss */}
                 <div
@@ -405,7 +422,7 @@ export default function ServicesScene() {
                       ref={el => { videoRefs.current[vi] = el; }}
                       src={prod.video}
                       loop muted playsInline
-                      className="absolute inset-0 w-full h-full object-cover"
+                      className={`absolute inset-0 w-full h-full ${prod.id === "vigil" ? "object-contain bg-black" : "object-cover"}`}
                       style={{ opacity: vi === active ? 1 : 0, transition: "opacity 0.3s ease", zIndex: 5 }}
                     />
                   ) : (
@@ -471,15 +488,19 @@ export default function ServicesScene() {
           </div>
 
           {/* ── RIGHT: Content ─────────────────────────────────────────────── */}
-          <div ref={contentRef} className="flex-1 flex flex-col max-w-[460px] w-full">
+          <div
+            ref={contentRef}
+            className="flex-1 min-h-0 flex flex-col max-w-[460px] w-full"
+            style={{ overflowY: "auto", scrollbarWidth: "none" }}
+          >
 
             {/* Icon + Step */}
-            <div className="psc-item flex items-center gap-3 mb-2">
+            <div className="psc-item flex items-center gap-3 mb-1.5">
               <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center"
+                className="w-9 h-9 rounded-xl flex items-center justify-center"
                 style={{ background: `${p.color}18`, border: `1px solid ${p.color}35` }}
               >
-                <Icon className="w-5 h-5" style={{ color: p.color }} />
+                <Icon className="w-4 h-4" style={{ color: p.color }} />
               </div>
               <span className="text-[10px] font-black tracking-[0.28em] uppercase" style={{ color: p.color, transition: "color 0.4s" }}>
                 Step {p.step}
@@ -495,14 +516,25 @@ export default function ServicesScene() {
             </h3>
 
             {/* Subtitle */}
-            <p className="psc-item text-sm mb-3" style={{ color: "rgba(255,255,255,0.35)" }}>
+            <p className="psc-item text-xs mb-2" style={{ color: "rgba(255,255,255,0.35)" }}>
               {p.fullName}
             </p>
 
-            {/* Quick win pill */}
-            <div className="psc-item mb-5">
+            {/* Accuracy badge + Quick win — same row */}
+            <div className="psc-item flex items-center gap-2 mb-3 flex-wrap">
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg"
+                style={{
+                  background: `${p.color}18`,
+                  border: `1.5px solid ${p.color}50`,
+                  transition: "all 0.4s",
+                }}>
+                <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: p.color }} />
+                <span className="text-[10px] font-black tracking-wider uppercase" style={{ color: p.color }}>
+                  {p.accuracy}
+                </span>
+              </div>
               <span
-                className="inline-block text-[10px] font-bold tracking-wider uppercase px-3 py-1 rounded-full"
+                className="inline-block text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded-full"
                 style={{
                   background: `${p.color}15`,
                   border: `1px solid ${p.color}40`,
@@ -514,26 +546,43 @@ export default function ServicesScene() {
               </span>
             </div>
 
-            {/* Tagline */}
-            <p className="psc-item text-[15px] leading-relaxed mb-6" style={{ color: "rgba(255,255,255,0.52)" }}>
+            {/* Headline hook */}
+            {p.headline ? (
+              <p
+                className="psc-item text-lg md:text-xl font-black text-white leading-snug mb-2"
+                style={{ letterSpacing: "-0.01em", whiteSpace: "pre-line" }}
+              >
+                {p.headline}
+              </p>
+            ) : null}
+
+            {/* Tagline / description */}
+            <p className="psc-item text-[13px] leading-relaxed mb-2" style={{ color: "rgba(255,255,255,0.52)" }}>
               {p.tagline}
             </p>
 
+            {/* Subtext kicker (VIGIL only) */}
+            {p.subtext ? (
+              <p className="psc-item text-[12px] font-semibold mb-3" style={{ color: "rgba(255,255,255,0.72)" }}>
+                {p.subtext}
+              </p>
+            ) : null}
+
             {/* Divider */}
             <div
-              className="psc-item h-px mb-6"
+              className="psc-item h-px mb-3"
               style={{ background: `linear-gradient(to right, ${p.color}45, transparent)`, transition: "background 0.4s" }}
             />
 
             {/* Features */}
-            <ul className="psc-item space-y-2.5 mb-7">
+            <ul className="psc-item space-y-2 mb-3">
               {p.features.map((f, fi) => (
-                <li key={fi} className="flex items-start gap-3">
+                <li key={fi} className="flex items-start gap-2.5">
                   <CheckCircle2
-                    className="w-4 h-4 flex-shrink-0 mt-0.5"
+                    className="w-3.5 h-3.5 flex-shrink-0 mt-0.5"
                     style={{ color: p.color, transition: "color 0.4s" }}
                   />
-                  <span className="text-[13.5px] leading-snug" style={{ color: "rgba(255,255,255,0.65)" }}>
+                  <span className="text-[12.5px] leading-snug" style={{ color: "rgba(255,255,255,0.65)" }}>
                     {f}
                   </span>
                 </li>
@@ -542,20 +591,20 @@ export default function ServicesScene() {
 
             {/* Result block */}
             <div
-              className="psc-item rounded-xl px-5 py-4 mb-6"
+              className="psc-item rounded-xl px-4 py-3 mb-3"
               style={{
                 background: `${p.color}0d`,
                 border: `1px solid ${p.color}2e`,
                 transition: "all 0.4s",
               }}
             >
-              <div className="flex items-start gap-3">
-                <Zap className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: p.color }} />
+              <div className="flex items-start gap-2.5">
+                <Zap className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: p.color }} />
                 <div>
-                  <p className="text-[9px] font-black tracking-widest uppercase mb-1" style={{ color: p.color }}>
+                  <p className="text-[9px] font-black tracking-widest uppercase mb-0.5" style={{ color: p.color }}>
                     Real result
                   </p>
-                  <p className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.72)" }}>
+                  <p className="text-[13px] font-semibold" style={{ color: "rgba(255,255,255,0.72)" }}>
                     {p.result}
                   </p>
                 </div>

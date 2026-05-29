@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import { gsap } from "@/lib/gsap";
 import { useGSAP } from "@/hooks/useGSAP";
+import { Sparkles } from "lucide-react";
 
 // ─── Data ──────────────────────────────────────────────────────────────────────
 const results = [
@@ -161,10 +162,14 @@ export default function ProofSection() {
 
         {/* ── Header ────────────────────────────────────────────────── */}
         <div className="text-center mb-24">
-          <p className="text-[11px] font-black tracking-[0.28em] uppercase mb-4"
-            style={{ color: "#60a5fa" }}>
-            Proof, Not Promises
-          </p>
+          {/* Aurora badge */}
+          <div className="relative inline-flex items-center justify-center p-[1.5px] mb-6 overflow-hidden rounded-full">
+            <div className="absolute top-1/2 left-1/2 w-[200%] h-[400%]" style={{ background: "conic-gradient(from 0deg at 50% 50%, rgba(98,170,222,0.6), rgba(22,55,145,0.2), rgba(98,170,222,0.6))", animation: "rotateAurora 4s linear infinite" }} />
+            <div className="relative flex items-center px-5 py-2.5 rounded-full" style={{ background: "rgba(6,13,31,0.9)", backdropFilter: "blur(12px)" }}>
+              <Sparkles className="w-3.5 h-3.5 mr-2" style={{ color: "#62AADE" }} />
+              <span className="text-xs font-semibold tracking-[0.2em] uppercase text-white">Proof, Not Promises</span>
+            </div>
+          </div>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-6"
             style={{ letterSpacing: "-0.025em" }}>
             Live results.<br />
@@ -228,10 +233,10 @@ export default function ProofSection() {
 
                 <div className="relative z-10 flex flex-col h-full">
 
-                  {/* Product + Industry */}
-                  <div className="flex items-center justify-between mb-8">
+                  {/* Product + Industry — stacked so long names never crowd */}
+                  <div className="flex flex-col gap-2 mb-8">
                     <span
-                      className="text-[11px] font-black tracking-[0.18em] uppercase px-3 py-1.5 rounded-full whitespace-nowrap"
+                      className="text-[11px] font-black tracking-[0.18em] uppercase px-3 py-1.5 rounded-full whitespace-nowrap self-start"
                       style={{
                         background: `${r.color}18`,
                         border:     `1px solid ${r.color}40`,
@@ -306,7 +311,7 @@ export default function ProofSection() {
               </span>
             ))}
             <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>|</span>
-            <span className="text-xs font-medium" style={{ color: "rgba(96,165,250,0.8)" }}>All standalone — start with one module</span>
+            <span className="text-xs font-medium" style={{ color: "rgba(96,165,250,0.8)" }}>All standalone. Start with one module.</span>
           </div>
         </div>
 

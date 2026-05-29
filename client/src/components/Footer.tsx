@@ -354,50 +354,58 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
                 <div className="grid grid-cols-3 gap-x-8 gap-y-2">
                   {/* Left: Socials (vertical) */}
                   <div className="space-y-1.5 text-left">
-                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors">Instagram</button>
-                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors">Facebook</button>
-                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors">LinkedIn</button>
-                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors">X</button>
+                    <a
+                      href="https://www.linkedin.com/company/autonex-ai/posts/?feedView=all"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block px-1 py-0.5 hover:text-foreground transition-colors"
+                    >
+                      LinkedIn
+                    </a>
                   </div>
                   {/* Middle: Navigation (vertical) */}
                   <div className="space-y-1.5 text-center">
                     <button className="block px-1 py-0.5 hover:text-foreground transition-colors" onClick={() => handleNavClick('home')}>Home</button>
-                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors" onClick={() => handleNavClick('vision')}>Our Vision</button>
-                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors" onClick={() => handleNavClick('services')}>Services</button>
+                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors" onClick={() => handleNavClick('why-autonex')}>Our Vision</button>
+                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors" onClick={() => handleNavClick('products')}>Services</button>
                     <button className="block px-1 py-0.5 hover:text-foreground transition-colors" onClick={() => handleNavClick('industries')}>Industries</button>
                     <button className="block px-1 py-0.5 hover:text-foreground transition-colors" onClick={goToContact}>Contact</button>
                   </div>
                   {/* Right: Legal (vertical) */}
                   <div className="space-y-1.5 text-right">
-                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors">Terms of Services</button>
-                    <button className="block px-1 py-0.5 hover:text-foreground transition-colors">Public Policy</button>
+                    <a href="/terms" className="block px-1 py-0.5 hover:text-foreground transition-colors">Terms of Service</a>
+                    <a href="/privacy" className="block px-1 py-0.5 hover:text-foreground transition-colors">Privacy Policy</a>
                   </div>
                 </div>
               </div>
 
-              {/* >= 1280px – single line, three groups with adjusted left bias */}
+              {/* >= 1280px – single line, three groups */}
               <div className="hidden xl:flex w-full items-center justify-between gap-x-8 gap-y-4 pl-8 pr-4 text-sm text-muted-foreground flex-wrap">
                 {/* Left: Socials */}
                 <div className="flex items-center gap-6 xl:gap-8 2xl:gap-12">
-                  <button className="hover:text-foreground transition-colors">Instagram</button>
-                  <button className="hover:text-foreground transition-colors">Facebook</button>
-                  <button className="hover:text-foreground transition-colors">LinkedIn</button>
-                  <button className="hover:text-foreground transition-colors">X</button>
+                  <a
+                    href="https://www.linkedin.com/company/autonex-ai/posts/?feedView=all"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    LinkedIn
+                  </a>
                 </div>
 
                 {/* Center: Navigation */}
                 <div className="flex items-center gap-6 xl:gap-8 2xl:gap-12">
                   <button className="hover:text-foreground transition-colors" onClick={() => handleNavClick('home')}>Home</button>
-                  <button className="hover:text-foreground transition-colors" onClick={() => handleNavClick('vision')}>Our Vision</button>
-                  <button className="hover:text-foreground transition-colors" onClick={() => handleNavClick('services')}>Services</button>
+                  <button className="hover:text-foreground transition-colors" onClick={() => handleNavClick('why-autonex')}>Our Vision</button>
+                  <button className="hover:text-foreground transition-colors" onClick={() => handleNavClick('products')}>Services</button>
                   <button className="hover:text-foreground transition-colors" onClick={() => handleNavClick('industries')}>Industries</button>
                   <button className="hover:text-foreground transition-colors" onClick={goToContact}>Contact</button>
                 </div>
 
                 {/* Right: Legal */}
                 <div className="flex items-center gap-6 xl:gap-8 2xl:gap-12">
-                  <button className="hover:text-foreground transition-colors">Terms of Service</button>
-                  <button className="hover:text-foreground transition-colors">Privacy Policy</button>
+                  <a href="/terms" className="hover:text-foreground transition-colors">Terms of Service</a>
+                  <a href="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</a>
                 </div>
               </div>
 

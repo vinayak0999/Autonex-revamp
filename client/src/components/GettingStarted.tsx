@@ -1,13 +1,13 @@
 import { useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { useGSAP } from "@/hooks/useGSAP";
-import { Zap } from "lucide-react";
+import { Zap, Sparkles } from "lucide-react";
 
 const steps = [
   {
     timeframe: "Day 1 – 7",
     heading:   "Discovery",
-    body:      "Share your existing camera or sensor feeds. Tell us your biggest pain point. We define KPIs for your POC together — so you know exactly what you're measuring.",
+    body:      "Share your existing camera or sensor feeds. Tell us your biggest pain point. We define KPIs for your POC together, so you know exactly what you're measuring.",
     color:     "#60a5fa",
     yOffset:   140,
   },
@@ -138,10 +138,14 @@ export default function GettingStarted() {
 
         {/* ── Header ──────────────────────────────────────────────────────────── */}
         <div className="text-center mb-16">
-          <p className="text-[11px] font-black tracking-[0.28em] uppercase mb-5"
-             style={{ color: "#60a5fa" }}>
-            Getting Started
-          </p>
+          {/* Aurora badge */}
+          <div className="relative inline-flex items-center justify-center p-[1.5px] mb-5 overflow-hidden rounded-full">
+            <div className="absolute top-1/2 left-1/2 w-[200%] h-[400%]" style={{ background: "conic-gradient(from 0deg at 50% 50%, rgba(98,170,222,0.6), rgba(22,55,145,0.2), rgba(98,170,222,0.6))", animation: "rotateAurora 4s linear infinite" }} />
+            <div className="relative flex items-center px-5 py-2.5 rounded-full" style={{ background: "rgba(6,13,31,0.9)", backdropFilter: "blur(12px)" }}>
+              <Sparkles className="w-3.5 h-3.5 mr-2" style={{ color: "#62AADE" }} />
+              <span className="text-xs font-semibold tracking-[0.2em] uppercase text-white">Getting Started</span>
+            </div>
+          </div>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05]"
               style={{ letterSpacing: "-0.025em" }}>
             Simple to start.<br />

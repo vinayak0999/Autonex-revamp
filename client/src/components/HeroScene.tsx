@@ -14,137 +14,6 @@ if (typeof window !== "undefined") {
   }, { passive: true });
 }
 
-// ─── Orb cycling terms ──────────────────────────────────────────────────
-const ORB_TERMS = [
-  "AI", "VISION", "TWIN", "EDGE AI", "AGENTS", "INFRA", "SENSE", "PREDICT"
-];
-
-// ─── Animated Orb ──────────────────────────────────────────────────
-function HeroOrb() {
-  const orbRef     = useRef<HTMLDivElement>(null);
-  const ring1Ref   = useRef<HTMLDivElement>(null);
-  const ring2Ref   = useRef<HTMLDivElement>(null);
-  const pulseRef   = useRef<HTMLDivElement>(null);
-  const orbTextRef = useRef<HTMLSpanElement>(null); // cycling text inside orb
-  const orbIdxRef  = useRef(0);
-
-  useEffect(() => {
-    if (!orbRef.current) return;
-    const ctx = gsap.context(() => {
-      // Breathing core
-      gsap.to(orbRef.current, { scale: 1.06, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: -1 });
-      // Ring 1 — slow spin
-      gsap.to(ring1Ref.current, { rotateX: 75, rotateZ: "+=360", duration: 12, ease: "none", repeat: -1 });
-      // Ring 2 — counter spin
-      gsap.to(ring2Ref.current, { rotateY: 75, rotateZ: "-=360", duration: 9, ease: "none", repeat: -1 });
-      // Expanding pulse ring
-      gsap.fromTo(
-        pulseRef.current,
-        { scale: 0.4, opacity: 0.7 },
-        { scale: 1.35, opacity: 0, duration: 2.8, ease: "power2.out", repeat: -1, repeatDelay: 0.4 }
-      );
-    });
-
-    // ── Magnetic snap cycler inside the orb ────────────────────────
-    function cycleOrbTerm() {
-      const el = orbTextRef.current;
-      if (!el) return;
-
-      // 1. Slide current term out to the LEFT
-      gsap.to(el, {
-        x: -55, opacity: 0,
-        duration: 0.22, ease: "power3.in",
-        onComplete: () => {
-          orbIdxRef.current = (orbIdxRef.current + 1) % ORB_TERMS.length;
-          const next = ORB_TERMS[orbIdxRef.current];
-          el.textContent = next;
-
-          // Dynamic font-size so longer terms fit inside the orb
-          const base = 36;
-          el.style.fontSize = Math.min(base, Math.max(14, base * (5 / Math.max(5, next.length)))) + "px";
-
-          // 2. Fly in from the RIGHT with elastic magnetic snap
-          gsap.fromTo(el,
-            { x: 65, opacity: 0, scale: 1.12 },
-            {
-              x: 0, opacity: 1, scale: 1,
-              duration: 0.8,
-              ease: "elastic.out(1.3, 0.38)",
-              onComplete: () => {
-                // 3. Physical vibration shimmy on landing
-                gsap.fromTo(el, { x: 0 }, {
-                  keyframes: [
-                    { x:  5, duration: 0.04 },
-                    { x: -4, duration: 0.04 },
-                    { x:  3, duration: 0.038 },
-                    { x: -2, duration: 0.035 },
-                    { x:  0, duration: 0.03  },
-                  ],
-                  ease: "none",
-                });
-              },
-            }
-          );
-        },
-      });
-    }
-
-    // Start cycling: first at 3 s (orb entrance done), then every 2.8 s
-    const timer   = setTimeout(() => {
-      cycleOrbTerm();
-      const intvl = setInterval(cycleOrbTerm, 2800);
-      // Store for cleanup
-      (orbRef.current as any).__orbIntvl = intvl;
-    }, 3000);
-    (orbRef.current as any).__orbTimer = timer;
-
-    return () => {
-      ctx.revert();
-      if (orbRef.current) {
-        clearTimeout((orbRef.current as any).__orbTimer);
-        clearInterval((orbRef.current as any).__orbIntvl);
-      }
-    };
-  }, []);
-
-  return (
-    <div className="relative w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 pointer-events-none select-none">
-      {/* Static orbit rings */}
-      <svg className="absolute inset-0 w-full h-full" fill="none">
-        <circle cx="50%" cy="50%" r="35%" stroke="rgba(98,170,222,0.08)" strokeWidth="1" />
-        <circle cx="50%" cy="50%" r="25%" stroke="rgba(98,170,222,0.06)" strokeWidth="1" />
-      </svg>
-      {/* Spinning ring 1 */}
-      <div ref={ring1Ref} className="absolute inset-[20%] border border-[#62AADE]/30 rounded-full" style={{ transformStyle: "preserve-3d" }} />
-      {/* Spinning ring 2 */}
-      <div ref={ring2Ref} className="absolute inset-[20%] border border-[#163791]/40 rounded-full" style={{ transformStyle: "preserve-3d" }} />
-      {/* Pulse ring */}
-      <div ref={pulseRef} className="absolute inset-0 border border-[#62AADE]/25 rounded-full" />
-      {/* Core glow */}
-      <div ref={orbRef} className="absolute inset-[30%] rounded-full" style={{ background: "radial-gradient(circle, rgba(22,55,145,0.7) 0%, rgba(98,170,222,0.3) 60%, transparent 100%)", boxShadow: "0 0 40px 8px rgba(22,55,145,0.5), 0 0 80px 15px rgba(98,170,222,0.15)", transformOrigin: "center" }}>
-        {/* overflow-hidden + rounded-full clips the text slide to the circular area */}
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full">
-          <span
-            ref={orbTextRef}
-            className="font-black tracking-tight select-none"
-            style={{
-              background: "linear-gradient(135deg, #ffffff, #62AADE)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              fontSize: 36,
-              display: "inline-block",
-              willChange: "transform, opacity",
-              whiteSpace: "nowrap",
-            }}
-          >
-            AI
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Ambient Mirror Glitch ─────────────────────────────────────────────
 // Starts 2 s after mount (well after entry animation is done).
@@ -225,7 +94,6 @@ export default function HeroScene() {
   const line2Ref = useRef<HTMLSpanElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
-  const orbWrapRef = useRef<HTMLDivElement>(null);
   const scrambleStop = useRef<(() => void) | null>(null);
 
   // ── Entrance timeline ──
@@ -248,8 +116,6 @@ export default function HeroScene() {
       // CTA buttons stagger
       tl.from(ctaRef.current?.children ?? [], { y: 28, opacity: 0, scale: 0.9, duration: 0.55, stagger: 0.1, ease: EASE_BACK }, 1.15);
 
-      // Orb
-      tl.from(orbWrapRef.current, { scale: 0.4, opacity: 0, duration: 1.0, ease: EASE_SPRING }, 1.35);
 
       // Parallax on scroll — hero text drifts up
       ScrollTrigger.create({
@@ -376,10 +242,6 @@ export default function HeroScene() {
                 </a>
               </div>
 
-              {/* Orb */}
-              <div ref={orbWrapRef} className="mt-16 sm:mt-20 mb-8 flex justify-center hero-parallax">
-                <HeroOrb />
-              </div>
 
             </div>
           </div>

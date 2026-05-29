@@ -413,13 +413,15 @@ function ProductBlock({
           <a
             href="/contact"
             id={`cta-${product.id}`}
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 hover:shadow-xl text-white"
+            className="group inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-sm transition-all duration-300 hover:scale-105 text-white relative overflow-hidden"
             style={{
-              background: `linear-gradient(135deg, ${product.color}, #163791)`,
-              boxShadow: `0 0 24px ${product.color}40`,
+              background: "linear-gradient(135deg, #62AADE 0%, #1e40af 100%)",
+              boxShadow: "0 0 28px rgba(98,170,222,0.35)",
             }}
           >
-            Book a Free Pilot <ArrowRight className="w-4 h-4" />
+            <span className="relative z-10 flex items-center gap-2">
+              Book a Free Pilot <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </span>
           </a>
         </div>
 
@@ -469,7 +471,7 @@ export default function Products() {
               </h1>
               <p className="text-xl text-foreground/55 max-w-2xl mx-auto leading-relaxed">
                 Start with the product that solves your biggest pain. Each
-                module is standalone — prove ROI before expanding.
+                module is standalone. Prove ROI before expanding.
               </p>
             </motion.div>
 
@@ -484,11 +486,21 @@ export default function Products() {
                 <a
                   key={p.id}
                   href={`#${p.id}`}
-                  className="px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-300 hover:scale-105"
+                  className="px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-300 hover:scale-105 text-white"
                   style={{
-                    color: p.color,
-                    borderColor: `${p.color}40`,
-                    background: `${p.color}10`,
+                    color: "rgba(255,255,255,0.7)",
+                    borderColor: "rgba(98,170,222,0.3)",
+                    background: "rgba(98,170,222,0.08)",
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.color = p.color;
+                    (e.currentTarget as HTMLElement).style.borderColor = p.color + "70";
+                    (e.currentTarget as HTMLElement).style.background = p.color + "15";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.7)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(98,170,222,0.3)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(98,170,222,0.08)";
                   }}
                 >
                   {p.name}
@@ -518,13 +530,15 @@ export default function Products() {
             <a
               href="/contact"
               id="products-bottom-cta"
-              className="inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-base transition-all duration-300 hover:scale-105 text-secondary-foreground"
+              className="group inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-base transition-all duration-300 hover:scale-105 text-white relative overflow-hidden"
               style={{
-                background: "hsl(var(--secondary))",
-                boxShadow: "0 0 40px hsl(var(--secondary)/0.4)",
+                background: "linear-gradient(135deg, #62AADE 0%, #1e40af 100%)",
+                boxShadow: "0 0 40px rgba(98,170,222,0.35)",
               }}
             >
-              Book a Free Pilot <Zap className="w-4 h-4" />
+              <span className="relative z-10 flex items-center gap-3">
+                Book a Free Pilot <Zap className="w-4 h-4" />
+              </span>
             </a>
           </div>
         </section>

@@ -6,7 +6,7 @@ const stats = [
   { value: 10, suffix: " Cr+", prefix: "INR ", label: "in client savings delivered" },
   { value: 20, suffix: "+", prefix: "", label: "Factories running Autonex live" },
   { value: 10000, suffix: "+", prefix: "", label: "Dispatches tracked with 99%+ accuracy" },
-  { value: 50, suffix: "%", prefix: "", label: "Drop in safety incidents — first month" },
+  { value: 50, suffix: "%", prefix: "", label: "Drop in safety incidents, first month" },
 ];
 
 function formatNum(n: number) {

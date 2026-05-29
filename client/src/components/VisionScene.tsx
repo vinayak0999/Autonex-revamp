@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Banknote, Factory, Cctv, Layers, Award, ChevronLeft, ChevronRight } from "lucide-react";
+import { Banknote, Factory, Cctv, Layers, Award, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 
 /* ─── Data ──────────────────────────────────────────────────────────────────── */
 const CARDS = [
@@ -49,7 +49,7 @@ const CARDS = [
     stat:        "IIT",
     statSub:     "Bombay patent",
     title:       "Patent-Published Tech",
-    description: "Digital Twin simulation patent-published at IIT Bombay. Proprietary IP — not a wrapper around someone else's API.",
+    description: "Digital Twin simulation patent-published at IIT Bombay. Proprietary IP, not a wrapper around someone else's API.",
     color:       "#62AADE",
     darkColor:   "rgba(98,170,222,0.06)",
     tag:         "DEEP TECH",
@@ -114,15 +114,14 @@ export default function VisionScene() {
 
       {/* ── Header ── */}
       <div className="relative z-10 text-center pt-24 pb-16 px-4">
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-xs font-black tracking-[0.3em] uppercase mb-4"
-          style={{ color: "#60a5fa" }}
-        >
-          Why Autonex
-        </motion.p>
+          {/* Aurora badge */}
+          <div className="relative inline-flex items-center justify-center p-[1.5px] mb-6 overflow-hidden rounded-full">
+            <div className="absolute top-1/2 left-1/2 w-[200%] h-[400%]" style={{ background: "conic-gradient(from 0deg at 50% 50%, rgba(98,170,222,0.6), rgba(22,55,145,0.2), rgba(98,170,222,0.6))", animation: "rotateAurora 4s linear infinite" }} />
+            <div className="relative flex items-center px-5 py-2.5 rounded-full" style={{ background: "rgba(6,13,31,0.9)", backdropFilter: "blur(12px)" }}>
+              <Sparkles className="w-3.5 h-3.5 mr-2" style={{ color: "#62AADE" }} />
+              <span className="text-xs font-semibold tracking-[0.2em] uppercase text-white">Why Autonex</span>
+            </div>
+          </div>
         <motion.h2
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
