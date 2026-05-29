@@ -191,18 +191,17 @@ export default function PainPoints() {
       </div>
 
       {/* ── Stacking Cards ──────────────────────────────────────────────────── */}
-      <div className="relative pb-32">
+      <div className="relative pb-8 lg:pb-32">
         {STEPS.map((step, i) => {
           const Icon = step.solution.icon;
           return (
             <div
               key={i}
               ref={(el) => { cardsRef.current[i] = el; }}
-              className="sticky top-0 h-screen w-full flex items-center justify-center p-4 md:p-8 origin-top"
+              className="lg:sticky top-0 min-h-[auto] lg:h-screen w-full flex items-center justify-center p-4 md:p-8 origin-top"
             >
-              {/* Card */}
               <div
-                className="relative w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 rounded-[2rem] overflow-hidden"
+                className="relative w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 rounded-[2rem] overflow-visible lg:overflow-hidden"
                 style={{
                   background: "rgba(6,13,31,0.92)",
                   border: `1px solid ${step.solution.color}25`,
@@ -225,9 +224,8 @@ export default function PainPoints() {
                   style={{ background: `linear-gradient(90deg, transparent, ${step.solution.color}, transparent)` }}
                 />
 
-                {/* ── LEFT: The Problem ───────────────────────────────────── */}
                 <div
-                  className="relative p-8 md:p-14 flex flex-col justify-center"
+                  className="relative p-6 md:p-14 flex flex-col justify-center"
                   style={{ borderRight: "1px solid rgba(255,255,255,0.07)" }}
                 >
                   {/* Watermark step number */}
@@ -285,8 +283,7 @@ export default function PainPoints() {
                   </div>
                 </div>
 
-                {/* ── RIGHT: The Solution ─────────────────────────────────── */}
-                <div className="relative p-8 md:p-14 flex flex-col justify-center">
+                <div className="relative p-6 md:p-14 flex flex-col justify-center border-t border-white/5 lg:border-t-0">
                   <div className="relative z-10">
 
                     {/* Solution header */}

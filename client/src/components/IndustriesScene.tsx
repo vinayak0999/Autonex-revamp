@@ -108,19 +108,32 @@ const industries = [
   },
 ];
 
-const CARD_W = 460;
-const CARD_H = 340;
+const BASE_CARD_W = 460;
+const BASE_CARD_H = 340;
 const STACK_OFFSET = 26; // px per layer, cards fan upper-right
 const AUTO_INTERVAL = 4200; // ms
 
+// Compute card dimensions that fit within available width
+function calcDims(numCards: number) {
+  const maxOff = (numCards - 1) * STACK_OFFSET;
+  const padded = typeof window !== "undefined" ? window.innerWidth - 32 : BASE_CARD_W + maxOff;
+  const needed = BASE_CARD_W + maxOff;
+  if (padded >= needed) return { w: BASE_CARD_W, h: BASE_CARD_H };
+  const scale = padded / needed;
+  return {
+    w: Math.floor(BASE_CARD_W * scale),
+    h: Math.floor(BASE_CARD_H * scale),
+  };
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 /** pos=0 → back (most stacked), pos=N-1 → front (fully visible) */
-function getCardStyle(pos: number, total: number): CSSProperties {
+function getCardStyle(pos: number, total: number, w: number, h: number): CSSProperties {
   const fromFront = total - 1 - pos; // 0 = front
   return {
     position: "absolute",
-    width: CARD_W,
-    height: CARD_H,
+    width: w,
+    height: h,
     left: fromFront * STACK_OFFSET,
     top: -fromFront * STACK_OFFSET,
     zIndex: pos + 1,
@@ -137,6 +150,16 @@ export default function IndustriesScene() {
   const progressRef = useRef<HTMLDivElement>(null);
   const timerRef    = useRef<ReturnType<typeof setInterval> | null>(null);
   const flipRef     = useRef<ReturnType<typeof Flip.getState> | null>(null);
+
+  // Responsive card dimensions
+  const [dims, setDims] = useState(() => calcDims(industries.length));
+  useEffect(() => {
+    const update = () => setDims(calcDims(industries.length));
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const maxOffset = (industries.length - 1) * STACK_OFFSET;
 
   // order[N-1] = front card index, order[0] = back card index
   const [order, setOrder] = useState(() => industries.map((_, i) => i));
@@ -254,8 +277,6 @@ export default function IndustriesScene() {
 
   const handleClick = () => { advance(); resetTimer(); };
 
-  const maxOffset = (industries.length - 1) * STACK_OFFSET;
-
   return (
     <Section id="industries" padding="xl">
       <SlideIn>
@@ -266,9 +287,10 @@ export default function IndustriesScene() {
         />
       </SlideIn>
 
-      <div ref={sectionRef} className="flex flex-col lg:flex-row items-start gap-16 mt-10">
+      <div ref={sectionRef} className="flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-16 mt-10">
 
-        {/* ── Stacked Card Deck ─────────────────────────────────────────── */}
+        {/* ── Stacked Card Deck ────────────────────────────────────────── */}
+        <div className="flex justify-center lg:justify-start">
         <div
           className="ind-deck-wrapper flex-shrink-0 select-none"
           style={{
@@ -279,7 +301,7 @@ export default function IndustriesScene() {
         >
           <div
             ref={sliderRef}
-            style={{ position: "relative", width: CARD_W, height: CARD_H }}
+            style={{ position: "relative", width: dims.w, height: dims.h }}
             onClick={handleClick}
             title="Click to advance"
           >
@@ -293,7 +315,7 @@ export default function IndustriesScene() {
                   className="ind-card"
                   data-flip-id={`ind-${ind.id}`}
                   style={{
-                    ...getCardStyle(pos, order.length),
+                    ...getCardStyle(pos, order.length, dims.w, dims.h),
                     borderRadius: 20,
                     overflow: "hidden",
                     background: "rgba(6, 11, 24, 0.92)",
@@ -392,11 +414,15 @@ export default function IndustriesScene() {
             })}
           </div>
         </div>
+        </div>
 
-        {/* ── Info Panel ────────────────────────────────────────────────── */}
+        {/* ── Info panel ────────────────────────────────────────── */}
         <div
-          className="ind-info-wrapper flex flex-col justify-between"
-          style={{ paddingTop: maxOffset, minHeight: CARD_H, maxWidth: 380 }}
+          className="ind-info-wrapper flex flex-col justify-between w-full lg:max-w-[380px]"
+          style={{
+            paddingTop: dims.w < BASE_CARD_W ? 0 : maxOffset,
+            minHeight: dims.w < BASE_CARD_W ? "auto" : dims.h,
+          }}
         >
           <div ref={infoRef}>
             {/* Counter */}

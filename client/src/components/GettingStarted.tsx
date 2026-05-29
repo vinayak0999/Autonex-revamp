@@ -216,13 +216,20 @@ export default function GettingStarted() {
             </g>
           </svg>
 
-          {/* 3 Cards — horizontal, staggered altitude */}
+          {/* 3 Cards — responsive: vertical on mobile, horizontal on md+ */}
           <div style={{
-            display: "flex", gap: "1.5rem", alignItems: "flex-start",
-            position: "relative", zIndex: 5,
-          }}>
+            display: "flex",
+            flexDirection: "column" as const,
+            gap: "1.5rem",
+            position: "relative",
+            zIndex: 5,
+          }}
+          className="sm:!flex-row sm:items-start"
+          >
             {steps.map((step, i) => (
-              <div key={i} className="gs-card flex-1" style={{ marginTop: step.yOffset }}>
+              <div key={i} className="gs-card flex-1" style={{ marginTop: 0 }}
+                   data-sm-margin={step.yOffset}
+              >
 
                 {/* Node dot — aligns with SVG NODE_Y */}
                 <div className="gs-node" style={{

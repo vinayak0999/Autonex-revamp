@@ -213,43 +213,40 @@ export default function ServicesScene() {
         },
       });
 
-      // Pin + chapter scroll
-      ScrollTrigger.create({
-        trigger: wrapRef.current,
-        start: "top 80px",
-        end: `+=${(window.innerHeight - 80) * (PRODUCTS.length - 1)}`,
-        pin: true,
-        pinSpacing: true,
-        anticipatePin: 1,
-        onUpdate(self) {
-          const idx = Math.max(0, Math.min(
-            Math.round(self.progress * (PRODUCTS.length - 1)),
-            PRODUCTS.length - 1
-          ));
-          if (idx === activeIdxRef.current) return;
-
-          // Direct update — no complex timeline blocking scroll-back
-          activeIdxRef.current = idx;
-          setActive(idx);
-          playVideo(idx);
-
-          // Quick flash on frame
-          if (frameRef.current) {
-            gsap.fromTo(frameRef.current,
-              { opacity: 0.6, scale: 0.96 },
-              { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out", overwrite: true }
-            );
-          }
-          // Slide content in
-          if (contentRef.current) {
-            gsap.fromTo(
-              contentRef.current.querySelectorAll(".psc-item"),
-              { y: 20, opacity: 0 },
-              { y: 0, opacity: 1, stagger: 0.05, duration: 0.4, ease: "power3.out", overwrite: true }
-            );
-          }
-        },
-      });
+      // Pin + chapter scroll — desktop only
+      if (window.innerWidth >= 1024) {
+        ScrollTrigger.create({
+          trigger: wrapRef.current,
+          start: "top 80px",
+          end: `+=${(window.innerHeight - 80) * (PRODUCTS.length - 1)}`,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
+          onUpdate(self) {
+            const idx = Math.max(0, Math.min(
+              Math.round(self.progress * (PRODUCTS.length - 1)),
+              PRODUCTS.length - 1
+            ));
+            if (idx === activeIdxRef.current) return;
+            activeIdxRef.current = idx;
+            setActive(idx);
+            playVideo(idx);
+            if (frameRef.current) {
+              gsap.fromTo(frameRef.current,
+                { opacity: 0.6, scale: 0.96 },
+                { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out", overwrite: true }
+              );
+            }
+            if (contentRef.current) {
+              gsap.fromTo(
+                contentRef.current.querySelectorAll(".psc-item"),
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, stagger: 0.05, duration: 0.4, ease: "power3.out", overwrite: true }
+              );
+            }
+          },
+        });
+      }
 
     }, sectionRef);
 
@@ -287,6 +284,20 @@ export default function ServicesScene() {
         }
         .sv-corner { animation: svCornerPulse 2.2s ease-in-out infinite; }
         @keyframes rotateAurora { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        /* ── Mobile: lift all height / overflow constraints ─────────── */
+        @media (max-width: 1023px) {
+          .sv-wrap {
+            height: auto !important;
+            min-height: auto !important;
+            overflow: visible !important;
+          }
+          .sv-inner {
+            flex: none !important;
+            overflow: visible !important;
+            height: auto !important;
+          }
+        }
       `}</style>
 
       {/* ── Section heading — scrolls normally, NOT pinned ──────────────── */}
@@ -330,16 +341,16 @@ export default function ServicesScene() {
       {/* ── Pinned: ONLY the video+content ─────────────────────────────── */}
       <div
         ref={wrapRef}
-        className="flex flex-col overflow-hidden"
+        className="sv-wrap flex flex-col overflow-hidden lg:overflow-hidden"
         style={{ height: "calc(100vh - 80px)" }}
       >
 
       {/* ── Two-column: VIDEO left · CONTENT right ─────────────────────── */}
-      <div className="flex-1 min-h-0 flex flex-col lg:flex-row items-center gap-6 lg:gap-10 px-6 md:px-12 xl:px-20 py-6 max-w-[1380px] mx-auto w-full overflow-hidden">
+      <div className="sv-inner flex-1 min-h-0 flex flex-col lg:flex-row items-center gap-6 lg:gap-10 px-6 md:px-12 xl:px-20 py-6 max-w-[1380px] mx-auto w-full">
 
           {/* ── LEFT: 3D Holographic Video Frame ──────────────────────────── */}
           <div
-            className="flex-1 min-h-0 w-full flex items-center justify-center"
+            className="w-full flex items-center justify-center lg:flex-1 lg:min-h-0"
             style={{ perspective: "1100px" }}
           >
             <div
@@ -490,7 +501,7 @@ export default function ServicesScene() {
           {/* ── RIGHT: Content ─────────────────────────────────────────────── */}
           <div
             ref={contentRef}
-            className="flex-1 min-h-0 flex flex-col max-w-[460px] w-full"
+            className="w-full max-w-[460px] mx-auto lg:flex-1 lg:min-h-0 flex flex-col"
             style={{ overflowY: "auto", scrollbarWidth: "none" }}
           >
 
