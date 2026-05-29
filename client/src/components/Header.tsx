@@ -117,16 +117,15 @@ export default function Header() {
             />
           </div>
           <div className="flex items-center justify-end gap-2">
-            <Button
+            <button
               ref={menuBtnRef as any}
-              variant="ghost"
-              size="icon"
               aria-label="Open menu"
-              className="h-12 w-12 hover:scale-105 transition-transform duration-150"
               onClick={() => setMenuOpen(true)}
+              className="hover:scale-105 transition-transform duration-150 flex items-center justify-center rounded-md"
+              style={{ width: 30, height: 30, background: "transparent", border: "none", cursor: "pointer", color: "white" }}
             >
-              <Menu className="h-8 w-8" />
-            </Button>
+              <Menu style={{ width: 36, height: 36 }} />
+            </button>
           </div>
         </div>
       </div>

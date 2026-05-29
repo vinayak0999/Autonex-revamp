@@ -427,13 +427,6 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
                     <p className="text-muted-foreground text-xs">© {currentYear} Autonex. All rights reserved.</p>
                   </div>
                   <div className="h-px w-4/5 bg-white/10" />
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 rounded-full bg-emerald-900/70 text-white px-3 py-1.5 text-xs shadow-sm hover:bg-emerald-900 transition-colors"
-                  >
-                    <span className="inline-block h-5 w-5 rounded-full bg-white/10 grid place-items-center">⚡</span>
-                    <span>Presented by Autonex AI</span>
-                  </a>
                 </div>
 
                 {/* Single row with equal spacing on small-to-large (<1280px) */}
@@ -448,13 +441,6 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
                     <span className="text-muted-foreground flex-shrink-0">|</span>
                     <p className="text-muted-foreground whitespace-nowrap text-[10px] sm:text-xs md:text-sm truncate">© {currentYear} Autonex. All rights reserved.</p>
                   </div>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 rounded-full bg-emerald-900/70 text-white px-3 py-1.5 text-xs shadow-sm hover:bg-emerald-900 transition-colors flex-shrink-0"
-                  >
-                    <span className="inline-block h-5 w-5 rounded-full bg-white/10 grid place-items-center">⚡</span>
-                    <span>Presented by Autonex AI</span>
-                  </a>
                 </div>
               </div>
 
@@ -471,15 +457,6 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
                   <p className="text-muted-foreground text-sm">© {currentYear} Autonex. All rights reserved.</p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 rounded-full bg-emerald-900/70 text-white px-4 py-2 text-sm shadow-sm hover:bg-emerald-900 transition-colors"
-                  >
-                    <span className="inline-block h-5 w-5 rounded-full bg-white/10 grid place-items-center">⚡</span>
-                    <span>Presented by Autonex AI</span>
-                  </a>
-                </div>
               </div>
 
               {/* Removed: shadow here now connects to the Schedule Consultation bordered box above */}

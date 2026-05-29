@@ -216,7 +216,7 @@ export default function HeroScene() {
 
               {/* CTAs */}
               <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4 justify-center items-center hero-parallax">
-                <a href="https://calendly.com/nikhilg-autonexai360/30min" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                <a href="/contact" className="w-full sm:w-auto">
                   <button
                     id="hero-cta-primary"
                     className="group relative text-base px-8 py-4 rounded-full font-bold w-full sm:w-auto overflow-hidden flex items-center justify-center gap-2 transition-transform duration-200 hover:scale-105 active:scale-95"
@@ -225,7 +225,7 @@ export default function HeroScene() {
                     onMouseLeave={(e) => { gsap.set(e.currentTarget.querySelector(".btn-shimmer"), { x: "-100%" }); }}
                   >
                     <div className="btn-shimmer absolute inset-0 w-1/3 skew-x-[-20deg]" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)", transform: "translateX(-100%)" }} />
-                    <span className="relative z-10 flex items-center gap-2">Discover Our Platform <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" /></span>
+                    <span className="relative z-10 flex items-center gap-2">Talk to Us <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" /></span>
                   </button>
                 </a>
                 <a href="/contact" className="w-full sm:w-auto">

@@ -495,52 +495,7 @@ export default function NewContact() {
               </motion.div>
             </div>
 
-            <section className="py-20">
-              <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-                  <motion.div
-                    className="text-center md:text-left"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.7 }}
-                  >
-                    <div className="max-w-3xl mx-auto md:mx-0 mb-10">
-                      <h2 className="text-3xl md:text-4xl font-bold mb-6 text-foreground">
-                        Frequently Asked <span className="text-secondary">Questions</span>
-                      </h2>
-                      <p className="text-muted-foreground">
-                        Find answers to common questions about our services and processes. If you can't find what you're looking for, feel free to reach out to us directly.
-                      </p>
-                    </div>
-                    <div className="max-w-xl mx-auto md:mx-0">
-                      <FaqAccordion />
-                    </div>
-                  </motion.div>
-                  <motion.div
-                    className="hidden md:block"
-                    initial={{ opacity: 0, x: 30 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.7 }}
-                  >
-                    <div className="relative rounded-xl overflow-hidden shadow-xl h-96">
-                      <img
-                        src={heroImg}
-                        alt="Modern workspace"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent">
-                        <div className="absolute bottom-0 left-0 p-6">
-                          <h3 className="text-white text-xl font-bold mb-1">Boost your business confidence</h3>
-                          <p className="text-white/80 text-sm">We're here to guide you through every step of the process.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-            </section>
+
 
             <div className="relative w-full min-h-[50vh] flex items-center justify-center overflow-hidden mt-32">
               <div className="absolute inset-0"
