@@ -79,10 +79,12 @@ export function SectionHeader({
   const titleContainerRef = useRef<HTMLSpanElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [titleBounds, setTitleBounds] = useState({ width: 0, height: 0 });
+  // Left offset (px) from the h2's left edge to where the first character actually starts.
+  // For centered multi-line text the h2 is full-width, so this offset > 0.
+  const [textLeftOffset, setTextLeftOffset] = useState(0);
   const [sweepActive, setSweepActive] = useState(false);
 
   useEffect(() => {
-    // Continuous flow effect: keep sweep active
     setSweepActive(true);
   }, []);
 
@@ -92,10 +94,26 @@ export function SectionHeader({
 
     const updateBounds = () => {
       const rect = headingEl.getBoundingClientRect();
-      setTitleBounds({
-        width: rect.width,
-        height: rect.height,
-      });
+      setTitleBounds({ width: rect.width, height: rect.height });
+
+      // Measure exact position of the first rendered character (e.g. "D")
+      // relative to the h2's own left edge, using the Range API.
+      let leftOffset = 0;
+      try {
+        const firstTextNode = Array.from(headingEl.childNodes).find(
+          (n) => n.nodeType === Node.TEXT_NODE && (n.textContent?.trim().length ?? 0) > 0
+        );
+        if (firstTextNode) {
+          const range = document.createRange();
+          range.setStart(firstTextNode, 0);
+          range.setEnd(firstTextNode, 1);
+          const charRect = range.getBoundingClientRect();
+          leftOffset = Math.max(0, charRect.left - rect.left);
+        }
+      } catch (_) {
+        // fallback: no offset
+      }
+      setTextLeftOffset(leftOffset);
     };
 
     updateBounds();
@@ -114,10 +132,17 @@ export function SectionHeader({
     };
   }, [title]);
 
+  // Glow is constrained to the actual text area: starts at the first character,
+  // width = element width minus the symmetric indent on both sides.
+  const glowLeft = textLeftOffset;
+  const glowWidth = titleBounds.width
+    ? Math.max(titleBounds.width - textLeftOffset * 2, titleBounds.width * 0.4)
+    : undefined;
+
   const glowStyle: CSSProperties = {
     top: 0,
-    left: 0,
-    width: titleBounds.width ? `${titleBounds.width}px` : "100%",
+    left: glowLeft > 0 ? `${glowLeft}px` : 0,
+    width: glowWidth ? `${glowWidth}px` : "100%",
     height: titleBounds.height ? `${titleBounds.height}px` : "100%",
     background:
       "linear-gradient(to right, transparent 0%, hsl(var(--primary)/0.06) 6%, hsl(var(--primary)/0.2) 20%, hsl(var(--primary)/0.28) 45%, hsl(var(--primary)/0.28) 55%, hsl(var(--primary)/0.2) 80%, hsl(var(--primary)/0.06) 94%, transparent 100%)",
@@ -125,6 +150,8 @@ export function SectionHeader({
     filter: "blur(12px)",
     transform: "translateZ(0)",
     willChange: "opacity",
+    // clip-path ensures the blur doesn't bleed left of the glow box
+    clipPath: "inset(0)",
   };
 
   return (
@@ -174,7 +201,12 @@ export function SectionHeader({
       )}
       
       <div className="mb-6">
-        <span ref={titleContainerRef} className="relative inline-block align-top overflow-hidden">
+        {/* clipPath: inset(0) forces hard GPU clip so blur never bleeds left of "D" */}
+        <span
+          ref={titleContainerRef}
+          className="relative inline-block align-top overflow-hidden"
+          style={{ clipPath: "inset(0)" }}
+        >
           <h2
             ref={titleRef}
             className={cn(
@@ -186,15 +218,41 @@ export function SectionHeader({
             {title}
           </h2>
           {/* Glow halo - dynamically sized to the measured text bounds */}
-          <span 
+          <span
             className="pointer-events-none absolute -z-10 opacity-40 block"
-            style={glowStyle} 
+            style={glowStyle}
           />
-          {/* Wave-like multi-sweep constrained to text width, continuous and soft */}
+          {/* Wave-like multi-sweep constrained to text width, continuous and soft.
+              The container's left/right are offset to textLeftOffset so the sweep
+              clips exactly at the first character position. */}
           {sweepActive && (
-            <span className="pointer-events-none absolute inset-0 block overflow-hidden -z-10" style={{ animation: "sectionTitleWaveBob 2.8s ease-in-out infinite" }}>
-              <span className="absolute top-0 bottom-0 left-0 w-1/3 opacity-35 mix-blend-screen blur-[1px]" style={{ background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)", animation: "sectionTitleWaveFlow 3s linear infinite" }} />
-              <span className="absolute top-0 bottom-0 left-0 w-1/4 opacity-25 mix-blend-screen blur-[2px]" style={{ background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)", animation: "sectionTitleWaveFlow 2.2s linear infinite", animationDelay: "0.6s" }} />
+            <span
+              className="pointer-events-none absolute block -z-10"
+              style={{
+                top: 0,
+                bottom: 0,
+                left: textLeftOffset > 0 ? `${textLeftOffset}px` : 0,
+                right: textLeftOffset > 0 ? `${textLeftOffset}px` : 0,
+                overflow: "hidden",
+                clipPath: "inset(0)",
+                animation: "sectionTitleWaveBob 2.8s ease-in-out infinite",
+              }}
+            >
+              <span
+                className="absolute top-0 bottom-0 left-0 w-1/3 opacity-35 mix-blend-screen"
+                style={{
+                  background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)",
+                  animation: "sectionTitleWaveFlow 3s linear infinite",
+                }}
+              />
+              <span
+                className="absolute top-0 bottom-0 left-0 w-1/4 opacity-25 mix-blend-screen"
+                style={{
+                  background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)",
+                  animation: "sectionTitleWaveFlow 2.2s linear infinite",
+                  animationDelay: "0.6s",
+                }}
+              />
             </span>
           )}
         </span>

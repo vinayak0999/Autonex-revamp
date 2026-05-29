@@ -1,227 +1,293 @@
-// import { Card, CardContent } from "@/components/ui/card";
-// import { Eye, AlertTriangle, Zap } from "lucide-react";
-// import { Section, SectionHeader } from "./motion/Section";
-// import { StaggerChildren, SlideIn, ScaleIn } from "./motion/Motion";
-// import { motion } from "framer-motion";
-// import MagneticExplode from "./motion/MagneticExplode";
+import { useRef, useEffect } from "react";
+import { gsap, Draggable } from "@/lib/gsap";
 
-// const visionCards = [
-//   {
-//     icon: Eye,
-//     title: "100% Transparency",
-//     description: "Build AI-native digital twins to unlock 100% transparency and intelligent, real-time decisions across industrial operations.",
-//     gradient: "from-blue-500/20 to-cyan-500/20"
-//   },
-//   {
-//     icon: AlertTriangle,
-//     title: "Predictive Intelligence",
-//     description: "Predict failures before they happen and eliminate blind spots across machines and processes.",
-//     gradient: "from-amber-500/20 to-orange-500/20"
-//   },
-//   {
-//     icon: Zap,
-//     title: "Optimized Operations",
-//     description: "Optimize quality, uptime, and sustainability - so every factory can think and act with the intelligence of the human mind.",
-//     gradient: "from-emerald-500/20 to-green-500/20"
-//   },
-// ];
-
-// export default function VisionScene() {
-//   return (
-//     <Section id="vision" background="gradient" padding="md" className="pt-4 sm:pt-5">
-//       <SlideIn>
-//         <SectionHeader
-//           eyebrow="Our Vision"
-//           title="The Future of Industrial Intelligence"
-//           subtitle="Transforming manufacturing through AI-powered insights and automation"
-//           className="mb-10"
-//         />
-//       </SlideIn>
-
-//       <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-8">
-//         {visionCards.map((card, index) => {
-//           const IconComponent = card.icon;
-//           return (
-//             <motion.div
-//               key={index}
-//               variants={{
-//                 hidden: { opacity: 0, y: 40 },
-//                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } }
-//               }}
-//               initial="hidden"
-//               whileInView="visible"
-//               viewport={{ once: false, amount: 0.2, margin: "0px 0px -10% 0px" }}
-//               data-testid={`card-vision-${index}`}
-//               className="h-full"
-//               data-vision-card={index}
-//             >
-//               <div className="relative h-full min-h-[22rem] md:min-h-[24rem]">
-//                 <Card className="group relative h-full overflow-hidden border-card-border bg-card/60 backdrop-blur-sm hover:bg-card/80 transition-all duration-500">
-//                   {/* Gradient Background */}
-//                   <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-
-//                   <CardContent className="relative p-10 text-center h-full flex flex-col">
-//                     {/* Icon */}
-//                     <div className="mb-8 flex justify-center">
-//                       <MagneticExplode triggerSelector={`[data-vision-card="${index}"]`}>
-//                         <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors duration-300 relative overflow-hidden">
-//                           <IconComponent className="h-10 w-10 text-primary relative z-10" data-testid={`icon-vision-${index}`} />
-//                         </div>
-//                       </MagneticExplode>
-//                     </div>
-
-//                     <h3 className="text-2xl font-bold text-card-foreground mb-6 group-hover:text-primary transition-colors duration-300" data-testid={`text-vision-title-${index}`}>
-//                       {card.title}
-//                     </h3>
-
-//                     <p className="text-muted-foreground leading-relaxed text-lg flex-grow" data-testid={`text-vision-description-${index}`}>
-//                       {card.description}
-//                     </p>
-
-//                     {/* Bottom Border */}
-//                     <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary/0 via-primary to-primary/0" />
-//                   </CardContent>
-//                 </Card>
-//               </div>
-//             </motion.div>
-//           );
-//         })}
-//       </StaggerChildren>
-//     </Section>
-//   );
-// }
-
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
-import { Eye, AlertTriangle, Zap } from "lucide-react";
-import { StaggerChildren, SlideIn, serviceCardHover } from "./motion/Motion";
-import MagneticExplode from "./motion/MagneticExplode";
-import { Section, SectionHeader } from "./motion/Section";
-import { Card, CardContent } from "@/components/ui/card";
-
-const visionCards = [
+const CARDS = [
   {
-    icon: Eye,
-    title: "100% Transparency",
-    description:
-      "Build AI-native digital twins to unlock 100% transparency and intelligent, real-time decisions across industrial operations.",
-    gradient: "from-blue-500/20 to-cyan-500/20",
+    emoji:       "💰",
+    title:       "20–50× Lower Cost",
+    description: "Optimised AI pipeline built for Indian industrial scale. Not priced for Fortune 500 budgets.",
+    color:       "#62AADE",                                                          // brand sapphire
+    bg:          "linear-gradient(145deg, #0c1f3d 0%, #060d1f 100%)",               // dark navy
   },
   {
-    icon: AlertTriangle,
-    title: "Predictive Intelligence",
-    description:
-      "Predict failures before they happen and eliminate blind spots across machines and processes.",
-    gradient: "from-blue-500/20 to-indigo-500/20",
+    emoji:       "🏭",
+    title:       "Trained on Your Factory",
+    description: "We train on your footage, your machines, your conditions. Nothing generic. Nothing off-the-shelf.",
+    color:       "#60a5fa",                                                          // bright blue (unchanged)
+    bg:          "linear-gradient(145deg, #0d2347 0%, #080f20 100%)",               // dark navy (unchanged)
   },
   {
-    icon: Zap,
-    title: "Optimized Operations",
-    description:
-      "Optimize quality, uptime, and sustainability - so every factory can think and act with the intelligence of the human mind.",
-    gradient: "from-emerald-500/20 to-green-500/20",
+    emoji:       "📷",
+    title:       "Works on Existing Cameras",
+    description: "No rip-and-replace. No new hardware budget. Your current CCTV is all we need to go live.",
+    color:       "#7bafd4",                                                          // steel blue (was amber)
+    bg:          "linear-gradient(145deg, #0e1e38 0%, #060d1f 100%)",               // dark navy (was orange)
+  },
+  {
+    emoji:       "🧩",
+    title:       "Start with One Module",
+    description: "Pick the product that solves your biggest pain today. Prove ROI. Then expand. No big-bang commitment.",
+    color:       "#a78bfa",                                                          // soft violet (unchanged — in brand gradient)
+    bg:          "linear-gradient(145deg, #1a1342 0%, #0c0921 100%)",               // dark navy-violet
+  },
+  {
+    emoji:       "🔬",
+    title:       "Patent-Published Tech",
+    description: "Digital Twin simulation patent-published, developed at IIT Bombay. Proprietary IP — not a wrapper.",
+    color:       "#34c4c4",                                                          // deep teal (was red)
+    bg:          "linear-gradient(145deg, #061f2b 0%, #030d18 100%)",               // dark teal-navy (was dark red)
   },
 ];
 
-export default function VisionScene() {
-  const total = visionCards.length;
-  const middleIndex = Math.floor(total / 2);
-
-  // Detect when the grid is in the viewport
-  const gridRef = useRef<HTMLDivElement>(null);
-  const gridInView = useInView(gridRef, {
-    amount: 0.35,
-    margin: "0px 0px -10% 0px",
+function buildSeamlessLoop(
+  items: HTMLElement[],
+  spacing: number,
+  animateFunc: (el: HTMLElement) => gsap.core.Timeline
+): gsap.core.Timeline {
+  const overlap      = Math.ceil(1 / spacing);
+  const startTime    = items.length * spacing + 0.5;
+  const loopTime     = (items.length + overlap) * spacing + 1;
+  const rawSequence  = gsap.timeline({ paused: true });
+  const seamlessLoop = gsap.timeline({
+    paused: true,
+    repeat: -1,
+    onRepeat(this: gsap.core.Timeline) {
+      // @ts-ignore
+      if (this._time === this._dur) this._tTime += this._dur - 0.01;
+    },
   });
 
+  for (let i = 0; i < items.length + overlap * 2; i++) {
+    const index = i % items.length;
+    rawSequence.add(animateFunc(items[index]), i * spacing);
+  }
+
+  rawSequence.time(startTime);
+  seamlessLoop
+    .to(rawSequence, { time: loopTime, duration: loopTime - startTime, ease: "none" })
+    .fromTo(rawSequence,
+      { time: overlap * spacing + 1 },
+      { time: startTime, duration: startTime - (overlap * spacing + 1), immediateRender: false, ease: "none" }
+    );
+  return seamlessLoop;
+}
+
+export default function VisionScene() {
+  const listRef     = useRef<HTMLUListElement>(null);
+  const dragProxRef = useRef<HTMLDivElement>(null);
+  const prevRef     = useRef<HTMLButtonElement>(null);
+  const nextRef     = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const list     = listRef.current;
+    const dragProx = dragProxRef.current;
+    if (!list || !dragProx) return;
+
+    const cardEls = Array.from(list.querySelectorAll<HTMLElement>(".vs-card"));
+    const spacing = 0.14;
+
+    gsap.set(cardEls, { xPercent: 400, opacity: 0, scale: 0 });
+
+    const animateFunc = (el: HTMLElement) => {
+      const tl = gsap.timeline();
+      tl.fromTo(el,
+        { scale: 0, opacity: 0 },
+        { scale: 1, opacity: 1, zIndex: 100, duration: 0.5, yoyo: true, repeat: 1, ease: "power1.in", immediateRender: false }
+      ).fromTo(el,
+        { xPercent: 400 },
+        { xPercent: -400, duration: 1, ease: "none", immediateRender: false },
+        0
+      );
+      return tl;
+    };
+
+    const seamlessLoop = buildSeamlessLoop(cardEls, spacing, animateFunc);
+    const snapTime     = gsap.utils.snap(spacing);
+    const wrapTime     = gsap.utils.wrap(0, seamlessLoop.duration());
+
+    const playhead = { offset: 0 };
+
+    // Scrub tween — used by drag and buttons
+    const scrub = gsap.to(playhead, {
+      offset: 0,
+      onUpdate() { seamlessLoop.time(wrapTime(playhead.offset)); },
+      duration: 0.5, ease: "power3", paused: true,
+    });
+
+    // Auto-play — just let the loop run on its own ticker
+    const autoTween = gsap.to(playhead, {
+      offset: "+=" + seamlessLoop.duration() * 10,   // run for a long time
+      duration: seamlessLoop.duration() * 10 / 0.06, // ~speed: 0.06 units/sec
+      ease: "none",
+      repeat: -1,
+      onUpdate() { seamlessLoop.time(wrapTime(playhead.offset)); },
+    });
+
+    const pauseAuto  = () => autoTween.pause();
+    const resumeAuto = () => autoTween.play();
+
+    // Snap to nearest card after interaction ends
+    const snapToNearest = () => {
+      autoTween.pause();
+      const snapped = snapTime(playhead.offset);
+      gsap.to(playhead, {
+        offset: snapped,
+        duration: 0.5, ease: "power3.out",
+        onUpdate() { seamlessLoop.time(wrapTime(playhead.offset)); },
+        onComplete() { resumeAuto(); },
+      });
+    };
+
+    // Prev / Next
+    const step = spacing;
+    prevRef.current?.addEventListener("click", () => {
+      pauseAuto();
+      playhead.offset -= step;
+      scrub.invalidate().restart();
+      setTimeout(snapToNearest, 600);
+    });
+    nextRef.current?.addEventListener("click", () => {
+      pauseAuto();
+      playhead.offset += step;
+      scrub.invalidate().restart();
+      setTimeout(snapToNearest, 600);
+    });
+
+    // Drag
+    Draggable.create(dragProx, {
+      type: "x",
+      trigger: list,
+      onPress() { pauseAuto(); (this as any).startOffset = playhead.offset; },
+      onDrag(this: Draggable) {
+        playhead.offset = (this as any).startOffset + ((this as any).startX - this.x) * 0.001;
+        seamlessLoop.time(wrapTime(playhead.offset));
+      },
+      onDragEnd() { snapToNearest(); },
+    });
+
+    return () => {
+      autoTween.kill();
+      scrub.kill();
+      seamlessLoop.kill();
+    };
+  }, []);
+
   return (
-    <Section
-      id="vision"
-      background="gradient"
-      padding="md"
-      className="pt-4 sm:pt-5 mt-8 sm:mt-10"
+    <section
+      id="why-autonex"
+      className="relative overflow-hidden"
+      style={{
+        height: "100vh",
+        background: "radial-gradient(ellipse at 50% 55%, rgba(96,165,250,0.04) 0%, transparent 60%)",
+      }}
     >
-      <SlideIn>
-        <SectionHeader
-          eyebrow="Our Vision"
-          title="The Future of Industrial Intelligence"
-          subtitle="Transforming manufacturing through AI-powered insights and automation"
-          className="mb-10"
-        />
-      </SlideIn>
-
-      <div ref={gridRef}>
-        <StaggerChildren className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {visionCards.map((card, index) => {
-            const IconComponent = card.icon;
-
-            return (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0 }}
-                animate={gridInView ? { opacity: 1 } : { opacity: 0 }}
-                data-testid={`card-vision-${index}`}
-                className="h-full"
-                data-vision-card={index}
-                style={{ perspective: 1000 }}
-              >
-                <motion.div
-                  className="relative h-full min-h-[22rem] md:min-h-[24rem]"
-                  whileHover={serviceCardHover}
-                >
-                  <Card className="group relative h-full overflow-hidden border border-secondary/30 bg-card/20 backdrop-blur-xl hover:border-tertiary/50 hover:bg-card/30 transition-all duration-500 shadow-lg shadow-black/50 hover:shadow-secondary/20 hover:shadow-2xl">
-                    {/* Premium glow effect on hover */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-tertiary/0 via-tertiary/0 to-tertiary/0 group-hover:from-tertiary/5 group-hover:via-tertiary/10 group-hover:to-tertiary/5 transition-all duration-500 rounded-xl" />
-
-                    {/* Subtle inner glow */}
-                    <div className="absolute inset-[1px] bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                    <CardContent className="relative p-10 text-center h-full flex flex-col z-10">
-                      {/* Icon with premium effect */}
-                      <div className="mb-8 flex justify-center">
-                        <MagneticExplode
-                          triggerSelector={`[data-vision-card="${index}"]`}
-                        >
-                          <div className="relative">
-                            {/* Outer glow ring */}
-                            <div className="absolute inset-0 rounded-2xl bg-tertiary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                            {/* Icon container */}
-                            <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-secondary/20 to-secondary/10 border border-secondary/30 flex items-center justify-center group-hover:border-tertiary/50 group-hover:bg-gradient-to-br group-hover:from-secondary/30 group-hover:to-tertiary/20 transition-all duration-300 shadow-lg shadow-secondary/10">
-                              <IconComponent
-                                className="h-10 w-10 text-tertiary group-hover:text-tertiary relative z-10 drop-shadow-[0_0_8px_rgba(98,170,222,0.5)] transition-all duration-300"
-                                data-testid={`icon-vision-${index}`}
-                              />
-                            </div>
-                          </div>
-                        </MagneticExplode>
-                      </div>
-
-                      {/* Title */}
-                      <h3
-                        className="text-2xl font-bold text-foreground mb-6 group-hover:text-tertiary transition-colors duration-300 drop-shadow-lg"
-                        data-testid={`text-vision-title-${index}`}
-                      >
-                        {card.title}
-                      </h3>
-
-                      {/* Description */}
-                      <p
-                        className="text-foreground/70 leading-relaxed text-lg flex-grow"
-                        data-testid={`text-vision-description-${index}`}
-                      >
-                        {card.description}
-                      </p>
-
-                      {/* Premium bottom glow */}
-                      <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-tertiary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 shadow-[0_0_10px_rgba(98,170,222,0.5)]" />
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              </motion.div>
-            );
-          })}
-        </StaggerChildren>
+      {/* Title */}
+      <div className="absolute top-0 left-0 right-0 z-20 text-center pt-28 pointer-events-none">
+        <p
+          className="text-[11px] font-black tracking-[0.28em] uppercase mb-3"
+          style={{ color: "#60a5fa" }}
+        >
+          Why Autonex
+        </p>
+        <h2
+          className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05]"
+          style={{ letterSpacing: "-0.025em" }}
+        >
+          Deep tech.<br />
+          <span style={{ color: "#60a5fa" }}>Nothing generic.</span>
+        </h2>
+        <p className="mt-2 text-xs" style={{ color: "rgba(255,255,255,0.22)", letterSpacing: "0.1em" }}>
+          DRAG OR USE BUTTONS
+        </p>
       </div>
-    </Section>
+
+      {/* Card list */}
+      <ul
+        ref={listRef}
+        style={{
+          position: "absolute",
+          width: "15rem",
+          top: "50%", left: "50%",
+          transform: "translate(-50%, -44%)",
+          listStyle: "none", margin: 0, padding: 0,
+        }}
+      >
+        {[...CARDS, ...CARDS].map((card, i) => (
+          <li
+            key={i}
+            className="vs-card"
+            style={{
+              position:       "absolute",
+              top: 0, left: 0,
+              width:          "15rem",
+              aspectRatio:    "9/16",
+              maxHeight:      "24rem",
+              borderRadius:   "1.2rem",
+              overflow:       "hidden",
+              background:     card.bg,
+              border:         `1px solid ${card.color}30`,
+              boxShadow:      `0 24px 60px rgba(0,0,0,0.7), 0 0 40px ${card.color}12`,
+              display:        "flex",
+              flexDirection:  "column",
+              alignItems:     "center",
+              justifyContent: "center",
+              padding:        "1.75rem 1.25rem",
+              textAlign:      "center",
+              gap:            "0.85rem",
+            }}
+          >
+            <div style={{ fontSize: "3rem", lineHeight: 1 }}>{card.emoji}</div>
+            <div style={{
+              width: 6, height: 6, borderRadius: "50%",
+              background: card.color, boxShadow: `0 0 10px ${card.color}`,
+              margin: "0.1rem auto",
+            }} />
+            <h3 style={{ fontSize: "1.05rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.01em", lineHeight: 1.25 }}>
+              {card.title}
+            </h3>
+            <p style={{ fontSize: "0.72rem", lineHeight: 1.55, color: "rgba(255,255,255,0.48)" }}>
+              {card.description}
+            </p>
+            <div style={{
+              position: "absolute", bottom: 0, left: 0, right: 0, height: 3,
+              background: `linear-gradient(90deg, transparent, ${card.color}, transparent)`,
+            }} />
+          </li>
+        ))}
+      </ul>
+
+      {/* Drag proxy */}
+      <div ref={dragProxRef} style={{ visibility: "hidden", position: "absolute" }} />
+
+      {/* Prev / Next */}
+      <div style={{
+        position: "absolute", bottom: 32, left: "50%",
+        transform: "translateX(-50%)",
+        display: "flex", gap: "0.75rem", zIndex: 30,
+      }}>
+        <button
+          ref={prevRef}
+          style={{
+            padding: "0.45rem 1.2rem", borderRadius: 999,
+            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+            color: "rgba(255,255,255,0.5)", fontFamily: "inherit", fontWeight: 700,
+            fontSize: "0.7rem", letterSpacing: "0.06em", cursor: "pointer",
+          }}
+        >
+          ← PREV
+        </button>
+        <button
+          ref={nextRef}
+          style={{
+            padding: "0.45rem 1.2rem", borderRadius: 999,
+            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
+            color: "rgba(255,255,255,0.5)", fontFamily: "inherit", fontWeight: 700,
+            fontSize: "0.7rem", letterSpacing: "0.06em", cursor: "pointer",
+          }}
+        >
+          NEXT →
+        </button>
+      </div>
+    </section>
   );
 }

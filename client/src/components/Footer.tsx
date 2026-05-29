@@ -246,59 +246,100 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
           style={{ background: 'transparent' }}
         />
 
-        {/* CTA/Hero section - hidden when hideCta is true */}
+        {/* ── CTA — LET'S GET STARTED TOGETHER ─────────────────────────── */}
         {!hideCta && (
-          <div className="relative w-full min-h-[50vh] flex items-center justify-center overflow-hidden">
-            <div className="absolute inset-0"
-              style={{
-                background: "linear-gradient(180deg, transparent 0%, hsl(var(--background)/0.1) 15%, hsl(var(--card)/0.2) 30%, hsl(var(--secondary)/0.15) 50%, hsl(var(--secondary)/0.3) 75%, hsl(var(--secondary)/0.5) 100%)"
-              }}
-            />
-            {/* subtle texture overlay */}
-            <div className="pointer-events-none absolute inset-0"
-              style={{
-                background: "linear-gradient(45deg, transparent 0%, hsl(var(--secondary)/0.05) 50%, transparent 100%)",
-                maskImage: "linear-gradient(to bottom, transparent 0%, black 20%, black 100%)"
-              }}
-            />
-            {/* seamless top blend */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background to-transparent" />
-
-            {/* bottom inner glow */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-[radial-gradient(60%_100%_at_50%_100%,hsl(var(--secondary)/0.15),transparent_70%)]" />
-
-            {/* Content wrapped in bordered-black container */}
-            <div className="relative z-10 max-w-5xl mx-auto px-6 text-center text-white">
-              <div
-                className="relative mx-auto p-10 md:p-14"
-              >
-                <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">{titleText}</h2>
-                <p className="text-lg md:text-xl text-white/80 mb-8 max-w-3xl mx-auto">{subtitleText}</p>
-
-                {/* Hero-style badge */}
-                <div className="mb-4" onClick={goToContact}>
-                  <div className="relative inline-flex items-center justify-center p-0.5 overflow-hidden rounded-full">
-                    <div className="absolute top-1/2 left-1/2 w-[200%] h-[400%]" style={{ background: 'conic-gradient(from 0deg at 50% 50%, hsl(220, 73%, 33%, 0.5), hsl(220, 73%, 33%, 0), hsl(220, 73%, 33%, 0.5))', animation: 'rotateAurora 4s linear infinite' }} />
-                    <div className="relative flex items-center px-6 py-3 rounded-full bg-zinc-900/70 backdrop-blur-sm">
-                      <Sparkles className="w-4 h-4 mr-2" style={{ color: 'hsl(220, 73%, 33%)' }} />
-                      <span className="text-sm font-semibold tracking-wider uppercase text-white">{primaryLabel}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Shadow removed as requested */}
-              </div>
-            </div>
-
-            {/* angled cut overlay with transparent corners */}
-            <div className="absolute inset-x-0 bottom-0 h-24" style={{
-              background: "linear-gradient(180deg, transparent 0%, hsl(var(--background)/0.6) 50%, hsl(var(--background)/0.3) 100%)",
-              clipPath: "polygon(0 0, 100% 0, 85% 100%, 15% 100%)"
+          <div
+            className="relative w-full overflow-hidden flex flex-col items-center justify-center"
+            style={{ minHeight: "62vh" }}
+          >
+            {/* Brand blue — soft, blended glow from bottom */}
+            <div style={{
+              position: "absolute",
+              bottom: 0, left: "50%",
+              transform: "translateX(-50%)",
+              width: "60%", height: "50%",
+              background: "radial-gradient(ellipse at 50% 100%, rgba(22,55,145,0.28) 0%, rgba(98,170,222,0.08) 55%, transparent 80%)",
+              filter: "blur(60px)",
+              pointerEvents: "none",
             }} />
 
-            {/* Additional corner transparency masks */}
-            <div className="absolute bottom-0 left-0 w-32 h-24 bg-gradient-to-tr from-transparent to-hsl(var(--background)/0.2)" />
-            <div className="absolute bottom-0 right-0 w-32 h-24 bg-gradient-to-tl from-transparent to-hsl(var(--background)/0.2)" />
+
+            {/* Top fade to blend with section above */}
+            <div style={{
+              position: "absolute", top: 0, left: 0, right: 0, height: 80,
+              background: "linear-gradient(to bottom, var(--background, #060d1f), transparent)",
+              pointerEvents: "none",
+            }} />
+
+            {/* ── Giant headline ──────────────────────────────────────────── */}
+            <div
+              className="relative z-10 text-center px-4"
+              style={{ paddingTop: "5rem", paddingBottom: "2.5rem" }}
+            >
+              <h2
+                style={{
+                  fontFamily:    "'Arial Black', 'Helvetica Neue', Impact, sans-serif",
+                  fontWeight:    900,
+                  textTransform: "uppercase",
+                  lineHeight:    0.92,
+                  color:         "#dce7f5",
+                  letterSpacing: "0.01em",
+                  textShadow:    "0 0 60px rgba(98,170,222,0.18), 0 0 20px rgba(22,55,145,0.12)",
+                }}
+              >
+                <span style={{ display: "block", fontSize: "clamp(2rem, 6.5vw, 7rem)", whiteSpace: "nowrap" }}>
+                  LET&apos;S GET STARTED
+                </span>
+                <span style={{ display: "block", fontSize: "clamp(2rem, 6.5vw, 7rem)", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+                  TOGETHER
+                </span>
+              </h2>
+
+              {/* ── SCHEDULE CONSULTATION button ──────────────────────────── */}
+              <div style={{ marginTop: "3.5rem" }}>
+                <a
+                  href="/contact"
+                  style={{
+                    display:        "inline-flex",
+                    alignItems:     "center",
+                    gap:            "0.65rem",
+                    padding:        "0.85rem 2.4rem",
+                    borderRadius:   999,
+                    background:     "rgba(8,14,35,0.85)",
+                    border:         "1px solid rgba(98,170,222,0.25)",
+                    color:          "rgba(255,255,255,0.88)",
+                    fontFamily:     "inherit",
+                    fontWeight:     700,
+                    fontSize:       "0.72rem",
+                    letterSpacing:  "0.22em",
+                    textTransform:  "uppercase",
+                    textDecoration: "none",
+                    cursor:         "pointer",
+                    backdropFilter: "blur(14px)",
+                    WebkitBackdropFilter: "blur(14px)",
+                    boxShadow:      "0 4px 32px rgba(0,0,0,0.5), 0 0 20px rgba(22,55,145,0.2), inset 0 1px 0 rgba(98,170,222,0.08)",
+                    transition:     "all 0.25s ease",
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLAnchorElement).style.background = "rgba(22,55,145,0.4)";
+                    (e.currentTarget as HTMLAnchorElement).style.border = "1px solid rgba(98,170,222,0.5)";
+                    (e.currentTarget as HTMLAnchorElement).style.transform = "scale(1.04)";
+                    (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 4px 40px rgba(0,0,0,0.5), 0 0 30px rgba(22,55,145,0.4)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLAnchorElement).style.background = "rgba(8,14,35,0.85)";
+                    (e.currentTarget as HTMLAnchorElement).style.border = "1px solid rgba(98,170,222,0.25)";
+                    (e.currentTarget as HTMLAnchorElement).style.transform = "scale(1)";
+                    (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 4px 32px rgba(0,0,0,0.5), 0 0 20px rgba(22,55,145,0.2), inset 0 1px 0 rgba(98,170,222,0.08)";
+                  }}
+                >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                  SCHEDULE CONSULTATION
+                </a>
+              </div>
+            </div>
           </div>
         )}
 

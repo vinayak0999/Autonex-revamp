@@ -1,2 +1,20 @@
 node_modules
 .env
+
+# Build output
+dist/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Large root-level media files (not needed in repo)
+*.mov
+*.mp4
+*.pdf
+*.docx
+*.txt
+
+# Exceptions — keep public video assets
+!client/public/videos/**
+!client/public/assets/**

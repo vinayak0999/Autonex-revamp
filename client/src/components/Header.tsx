@@ -1,12 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useLocation } from "wouter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap, EASE_POWER4 } from "@/lib/gsap";
 
 export default function Header() {
   const [, navigate] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+  const logoRef = useRef<HTMLImageElement>(null);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const menuPanelRef = useRef<HTMLDivElement>(null);
+  const menuItemsRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -14,6 +20,58 @@ export default function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll as any);
   }, []);
+
+  // Header entrance animation on mount
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      gsap.from(headerRef.current, {
+        y: -70,
+        opacity: 0,
+        duration: 0.9,
+        ease: EASE_POWER4,
+        delay: 0.1,
+      });
+      gsap.from(logoRef.current, {
+        scale: 0.6,
+        opacity: 0,
+        duration: 0.9,
+        ease: "back.out(1.7)",
+        delay: 0.35,
+      });
+      gsap.from(menuBtnRef.current, {
+        x: 30,
+        opacity: 0,
+        duration: 0.7,
+        ease: EASE_POWER4,
+        delay: 0.5,
+      });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  // Menu open/close animation
+  useEffect(() => {
+    if (!menuPanelRef.current) return;
+    if (menuOpen) {
+      gsap.fromTo(
+        menuPanelRef.current,
+        { x: "100%", opacity: 0 },
+        { x: "0%", opacity: 1, duration: 0.45, ease: "power3.out" }
+      );
+      // Stagger menu items
+      const items = menuItemsRef.current?.querySelectorAll("li");
+      if (items) {
+        gsap.from(items, {
+          x: 40,
+          opacity: 0,
+          duration: 0.45,
+          stagger: 0.08,
+          ease: "power3.out",
+          delay: 0.2,
+        });
+      }
+    }
+  }, [menuOpen]);
 
   const handleNavClick = (sectionId: string) => {
     setMenuOpen(false);
@@ -38,80 +96,110 @@ export default function Header() {
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${scrolled ? "bg-background/80 backdrop-blur-md border-b border-border" : "bg-transparent"}`}>
+    <header
+      ref={headerRef}
+      className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? "bg-background/80 backdrop-blur-md border-b border-border" : "bg-transparent"
+      }`}
+      style={{ top: 14 }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-3 items-center h-16">
-          {/* Left: empty spacer */}
+        <div className="grid grid-cols-3 items-center h-20">
           <div />
-
-          {/* Center: Logo */}
           <div className="flex items-center justify-center">
             <img
+              ref={logoRef}
               src="/path25.png"
-              alt="Logo"
-              className="h-10 w-auto object-contain cursor-pointer"
+              alt="Autonex Logo"
+              className="h-14 w-auto object-contain cursor-pointer transition-transform duration-200 hover:scale-105"
+              style={{ filter: "brightness(1.95) saturate(1.1)" }}
               onClick={() => handleNavClick("home")}
             />
           </div>
-
-          {/* Right: Menu */}
           <div className="flex items-center justify-end gap-2">
             <Button
+              ref={menuBtnRef as any}
               variant="ghost"
               size="icon"
               aria-label="Open menu"
-              className="hover:scale-105 transition-transform duration-150"
+              className="h-12 w-12 hover:scale-105 transition-transform duration-150"
               onClick={() => setMenuOpen(true)}
             >
-              <Menu className="h-6 w-6" />
+              <Menu className="h-8 w-8" />
             </Button>
           </div>
         </div>
       </div>
 
-      {/* Quarter-circle Menu (top-right) */}
+      {/* Quarter-circle menu */}
       {menuOpen && (
         <div className="fixed inset-0 z-[60]">
-          {/* scrim */}
-          <button aria-label="Close menu overlay" onClick={() => setMenuOpen(false)} className="absolute inset-0 bg-black/30 backdrop-blur-md" />
-
-          {/* panel */}
+          {/* Scrim */}
+          <button
+            aria-label="Close menu overlay"
+            onClick={() => setMenuOpen(false)}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+          />
+          {/* Panel */}
           <div className="pointer-events-none absolute top-0 right-0 w-[85vw] max-w-[520px] aspect-square overflow-hidden rounded-bl-[100%]">
-            <div className="pointer-events-auto absolute inset-0 bg-transparent backdrop-blur-lg text-white shadow-2xl translate-x-full animate-[menuSlideIn_.35s_ease-out_forwards] flex flex-col" style={{ border: '1px solid hsl(220, 73%, 33%, 0.3)' }}>
+            <div
+              ref={menuPanelRef}
+              className="pointer-events-auto absolute inset-0 text-white shadow-2xl flex flex-col"
+              style={{
+                background: "rgba(6,13,31,0.92)",
+                backdropFilter: "blur(20px)",
+                border: "1px solid rgba(98,170,222,0.2)",
+              }}
+            >
               <div className="p-3 self-end">
-                <Button variant="ghost" size="icon" aria-label="Close menu" onClick={() => setMenuOpen(false)}>
-                  <X className="h-5 w-5" />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Close menu"
+                  className="h-11 w-11"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <X className="h-7 w-7" />
                 </Button>
               </div>
               <nav className="flex-1 overflow-y-auto p-8 pt-10 pr-12 pl-32 md:pl-40 lg:pl-44">
-                <ul className="space-y-3">
+                <ul ref={menuItemsRef} className="space-y-3">
                   <li className="ml-0 md:ml-2">
-                    <Button variant="ghost" className="justify-start w-full text-lg blue-hover" onClick={() => handleNavClick("home")}>
+                    <Button
+                      variant="ghost"
+                      className="justify-start w-full text-lg nav-item-hover"
+                      onClick={() => handleNavClick("home")}
+                    >
                       Home
                     </Button>
                   </li>
                   <li className="ml-6 md:ml-8">
-                    <Button variant="ghost" className="justify-start w-full text-lg blue-hover" onClick={() => goToTopAndClose("/products")}>
+                    <Button
+                      variant="ghost"
+                      className="justify-start w-full text-lg nav-item-hover"
+                      onClick={() => goToTopAndClose("/products")}
+                    >
                       Products
                     </Button>
                   </li>
                   <li className="ml-10 md:ml-14">
-                    <Button variant="ghost" className="justify-start w-full text-lg blue-hover" onClick={() => goToTopAndClose("/about")}>
+                    <Button
+                      variant="ghost"
+                      className="justify-start w-full text-lg nav-item-hover"
+                      onClick={() => goToTopAndClose("/about")}
+                    >
                       About
                     </Button>
                   </li>
-
                 </ul>
               </nav>
             </div>
           </div>
 
-          {/* keyframes for slide in and blue hover styles */}
           <style>{`
-            @keyframes menuSlideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}
-            .blue-hover:hover {
-              background-color: rgba(255,255,255,0.08) !important; /* greyish/whitish hover */
-              color: #ffffff !important; /* whitish text */
+            .nav-item-hover:hover {
+              background-color: rgba(98,170,222,0.1) !important;
+              color: #62AADE !important;
             }
           `}</style>
         </div>

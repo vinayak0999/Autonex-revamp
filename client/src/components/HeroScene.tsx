@@ -1,378 +1,389 @@
-// // src/components/IndustrialHero.tsx
+import React, { useRef, useEffect, useState } from "react";
+import { ArrowRight, Users, Sparkles } from "lucide-react";
+import { gsap, ScrollTrigger, EASE_POWER4, EASE_BACK, EASE_SPRING } from "@/lib/gsap";
 
-// import React, { useState, useEffect, useRef } from 'react';
-// import { ArrowRight, Users, Sparkles } from 'lucide-react';
+// ─── Cursor Mouse Tracker (feeds into ParticleBackground) ─────────────────
+// We expose mouse position globally so the full-page ParticleBackground
+// can react to cursor movement across ALL sections.
+export const globalMouse = { x: -9999, y: -9999 };
 
-// const keyframesCSS = `
-//   @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-//   @keyframes rotateAurora { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-//   @keyframes spin-horizontal { from { transform: rotateX(75deg) rotateZ(0deg); } to { transform: rotateX(75deg) rotateZ(360deg); } }
-//   @keyframes spin-vertical { from { transform: rotateY(75deg) rotateZ(0deg); } to { transform: rotateY(75deg) rotateZ(-360deg); } }
-//   @keyframes pulse-out { 0% { transform: scale(0.3); opacity: 0.8; } 100% { transform: scale(1.2); opacity: 0; } }
-// `;
+if (typeof window !== "undefined") {
+  window.addEventListener("mousemove", (e) => {
+    globalMouse.x = e.clientX;
+    globalMouse.y = e.clientY;
+  }, { passive: true });
+}
 
-// export default function IndustrialHero() {
-//   const [started, setStarted] = useState(false);
-//   const sectionRef = useRef<HTMLElement>(null);
-//   const canvasRef = useRef<HTMLCanvasElement>(null);
-//   const [isMobile, setIsMobile] = useState(false);
+// ─── Orb cycling terms ──────────────────────────────────────────────────
+const ORB_TERMS = [
+  "AI", "VISION", "TWIN", "EDGE AI", "AGENTS", "INFRA", "SENSE", "PREDICT"
+];
 
-//   // --- FIX FOR HORIZONTAL SCROLL ---
-//   // This effect programmatically prevents the entire page from scrolling horizontally.
-//   useEffect(() => {
-//     // When the component mounts, force the body to hide horizontal overflow.
-//     document.body.style.overflowX = 'hidden';
-//     // When the component unmounts, clean up the style.
-//     return () => {
-//         document.body.style.overflowX = '';
-//     };
-//   }, []); // The empty array [] ensures this runs only once when the component mounts.
+// ─── Animated Orb ──────────────────────────────────────────────────
+function HeroOrb() {
+  const orbRef     = useRef<HTMLDivElement>(null);
+  const ring1Ref   = useRef<HTMLDivElement>(null);
+  const ring2Ref   = useRef<HTMLDivElement>(null);
+  const pulseRef   = useRef<HTMLDivElement>(null);
+  const orbTextRef = useRef<HTMLSpanElement>(null); // cycling text inside orb
+  const orbIdxRef  = useRef(0);
 
-//   // Effect to check screen size for performance optimization
-//   useEffect(() => {
-//     const checkScreenSize = () => {
-//       setIsMobile(window.innerWidth < 768); // 768px is the 'md' breakpoint
-//     };
-//     checkScreenSize();
-//     window.addEventListener('resize', checkScreenSize);
-//     return () => window.removeEventListener('resize', checkScreenSize);
-//   }, []);
-
-//   // Logic to trigger animations on scroll
-//   useEffect(() => {
-//     const observer = new IntersectionObserver(
-//       (entries) => {
-//         if (entries[0].isIntersecting) {
-//           setStarted(true);
-//           observer.disconnect();
-//         }
-//       },
-//       { threshold: 0.1 }
-//     );
-//     if (sectionRef.current) observer.observe(sectionRef.current);
-//     return () => {
-//       if (sectionRef.current) observer.unobserve(sectionRef.current);
-//     };
-//   }, []);
-
-//   // --- PARTICLE BACKGROUND LOGIC ---
-//   useEffect(() => {
-//     const canvas = canvasRef.current;
-//     if (!canvas) return;
-//     const ctx = canvas.getContext('2d');
-//     if (!ctx) return;
-//     const context = ctx as CanvasRenderingContext2D;
-
-//     if (isMobile) {
-//       ctx.fillStyle = '#09090b';
-//       ctx.fillRect(0, 0, canvas.width, canvas.height);
-//       return; 
-//     }
-
-//     let animationFrameId: number;
-//     let particles: any[];
-//     const primaryColorHsl = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '28 92% 56%';
-
-//     class Particle {
-//       x: number; y: number; size: number; speedX: number; speedY: number;
-//       constructor(x: number, y: number, size: number, speedX: number, speedY: number) { this.x = x; this.y = y; this.size = size; this.speedX = speedX; this.speedY = speedY; }
-//       update(width: number, height: number) {
-//         if (this.x > width || this.x < 0) this.speedX = -this.speedX;
-//         if (this.y > height || this.y < 0) this.speedY = -this.speedY;
-//         this.x += this.speedX; this.y += this.speedY;
-//       }
-//       draw() {
-//         context.fillStyle = `hsl(${primaryColorHsl} / 1.0)`;
-//         context.beginPath(); context.arc(this.x, this.y, this.size, 0, Math.PI * 2); context.fill();
-//       }
-//     }
-
-//     const init = () => {
-//       const dpr = window.devicePixelRatio || 1;
-//       const width = window.innerWidth;
-//       const height = window.innerHeight;
-//       canvas.width = width * dpr;
-//       canvas.height = height * dpr;
-//       canvas.style.width = `${width}px`;
-//       canvas.style.height = `${height}px`;
-//       context.scale(dpr, dpr);
-//       particles = [];
-//       const numberOfParticles = Math.floor((width * height) / 25000);
-//       for (let i = 0; i < numberOfParticles; i++) {
-//         const size = Math.random() * 1.5 + 0.5;
-//         const x = Math.random() * width;
-//         const y = Math.random() * height;
-//         const speedX = (Math.random() * 0.3) - 0.15;
-//         const speedY = (Math.random() * 0.3) - 0.15;
-//         particles.push(new Particle(x, y, size, speedX, speedY));
-//       }
-//     };
-
-//     const animate = () => {
-//       if (!particles) return;
-//       const width = window.innerWidth;
-//       const height = window.innerHeight;
-//       context.fillStyle = '#09090b';
-//       context.fillRect(0, 0, width, height);
-//       particles.forEach(p => { p.update(width, height); p.draw(); });
-//       animationFrameId = requestAnimationFrame(animate);
-//     };
-
-//     init();
-//     animate();
-//     window.addEventListener('resize', init);
-//     return () => {
-//       window.removeEventListener('resize', init);
-//       cancelAnimationFrame(animationFrameId);
-//     };
-//   }, [isMobile]);
-
-
-//   const getAnimStyle = (delay: number) => ({
-//     opacity: started ? 1 : 0,
-//     animation: started ? `fadeInUp 0.8s ${delay}s cubic-bezier(0.16, 1, 0.3, 1) forwards` : 'none',
-//   });
-
-//   return (
-//     <>
-//       <style>{keyframesCSS}</style>
-//       <section id="home" ref={sectionRef} className="relative min-h-[100svh] overflow-hidden pt-24 pb-2 sm:pb-4">
-//         <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full -z-10" />
-
-//         <div className="min-h-[calc(100svh-10rem)] flex items-center justify-center">
-//           <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
-//             <div className="max-w-6xl mx-auto">
-//               {/* Badge, Headline, Subtitle, and Buttons... */}
-//               <div style={getAnimStyle(0.2)}>
-//                 <div className="relative inline-flex items-center justify-center p-0.5 mb-8 overflow-hidden rounded-full">
-//                   <div className="absolute top-1/2 left-1/2 w-[200%] h-[400%]" style={{ background: 'conic-gradient(from 0deg at 50% 50%, hsl(var(--primary)/0.5), hsl(var(--primary)/0), hsl(var(--primary)/0.5))', animation: 'rotateAurora 4s linear infinite' }} />
-//                   <div className="relative flex items-center px-6 py-3 rounded-full bg-zinc-900/90 backdrop-blur-sm">
-//                     <Sparkles className="w-4 h-4 mr-2 text-primary" />
-//                     <span className="text-sm font-semibold tracking-wider uppercase text-white">Next-Gen Industrial Intelligence</span>
-//                   </div>
-//                 </div>
-//               </div>
-//               <div style={getAnimStyle(0.4)}>
-//                 <h1 className="text-3xl sm:text-5xl md:text-7xl font-black leading-tight tracking-tighter mb-6">
-//                   <span className="block">AI AGENTS & DATA INFRA</span>
-//                   <span className="block text-primary">FOR SMARTER INDUSTRIAL SYSTEMS</span>
-//                 </h1>
-//               </div>
-//               <div style={getAnimStyle(0.7)}>
-//                 <p className="text-lg md:text-xl max-w-4xl mx-auto leading-relaxed text-zinc-300 mb-10">
-//                   We combine machine-level optimization with domain-specific intelligence to automate decisions, enhance transparency, and create datasets that fuel the next generation of robotics.
-//                 </p>
-//               </div>
-//               <div style={getAnimStyle(0.9)} className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-//                 <button className="group relative text-base px-8 py-4 rounded-full font-bold transition-transform duration-300 hover:scale-105 flex items-center overflow-hidden bg-primary text-white w-full sm:w-auto shadow-[0_0_40px_hsl(var(--primary)/0.4)]">
-//                   <span className="relative z-10 flex items-center justify-center gap-2">Discover Our Platform <ArrowRight className="h-5 w-5 group-hover:translate-x-1" /></span>
-//                 </button>
-//                 <button className="group text-base px-8 py-4 rounded-full font-bold transition-all duration-300 hover:scale-105 flex items-center backdrop-blur-sm bg-white/5 border-2 border-white/10 text-zinc-100 w-full sm:w-auto">
-//                   <Users className="mr-2 h-5 w-5 group-hover:scale-110" /> Join as a Partner
-//                 </button>
-//               </div>
-
-//               {/* Inline AI Logo container shown directly under CTAs, responsive and centered */}
-//               <div style={getAnimStyle(1.0)} className="mt-10 sm:mt-12 flex justify-center">
-//                 <div className="relative w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 pointer-events-none select-none">
-//                   <div className="absolute inset-0 animate-pulse" style={{ animationDelay: '1s' }}>
-//                     <svg className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-//                       <circle cx="50%" cy="50%" r="35%" className="stroke-primary/10" strokeWidth="1" />
-//                       <circle cx="50%" cy="50%" r="25%" className="stroke-primary/10" strokeWidth="1" />
-//                     </svg>
-//                   </div>
-//                   <div className="absolute inset-[35%] rounded-full bg-primary/20 shadow-[0_0_30px_5px_hsl(var(--primary)/0.3)] animate-pulse">
-//                     <div className="absolute inset-4 rounded-full bg-primary/30 shadow-[inset_0_0_10px_hsl(var(--primary))] flex items-center justify-center text-primary font-bold text-3xl sm:text-4xl">AI</div>
-//                   </div>
-//                   <div className="absolute inset-[20%] border border-primary/30 rounded-full" style={{ transform: 'rotateX(75deg)', animation: 'spin-horizontal 10s linear infinite' }} />
-//                   <div className="absolute inset-[20%] border border-primary/30 rounded-full" style={{ transform: 'rotateY(75deg)', animation: 'spin-vertical 12s linear infinite' }} />
-//                   <div className="absolute inset-0 border border-primary/20 rounded-full" style={{ animation: 'pulse-out 3s ease-out infinite' }} />
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//       </section>
-//     </>
-//   );
-// }
-
-
-// src/components/IndustrialHero.tsx
-
-import React, { useState, useEffect, useRef } from 'react';
-import { ArrowRight, Users, Sparkles } from 'lucide-react';
-
-const keyframesCSS = `
-  @keyframes rotateAurora { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
-`;
-
-
-export default function IndustrialHero() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // --- FIX FOR HORIZONTAL SCROLL ---
-  // This effect programmatically prevents the entire page from scrolling horizontally.
   useEffect(() => {
-    // When the component mounts, force the body to hide horizontal overflow.
-    document.body.style.overflowX = 'hidden';
-    // When the component unmounts, clean up the style.
+    if (!orbRef.current) return;
+    const ctx = gsap.context(() => {
+      // Breathing core
+      gsap.to(orbRef.current, { scale: 1.06, duration: 2.2, ease: "sine.inOut", yoyo: true, repeat: -1 });
+      // Ring 1 — slow spin
+      gsap.to(ring1Ref.current, { rotateX: 75, rotateZ: "+=360", duration: 12, ease: "none", repeat: -1 });
+      // Ring 2 — counter spin
+      gsap.to(ring2Ref.current, { rotateY: 75, rotateZ: "-=360", duration: 9, ease: "none", repeat: -1 });
+      // Expanding pulse ring
+      gsap.fromTo(
+        pulseRef.current,
+        { scale: 0.4, opacity: 0.7 },
+        { scale: 1.35, opacity: 0, duration: 2.8, ease: "power2.out", repeat: -1, repeatDelay: 0.4 }
+      );
+    });
+
+    // ── Magnetic snap cycler inside the orb ────────────────────────
+    function cycleOrbTerm() {
+      const el = orbTextRef.current;
+      if (!el) return;
+
+      // 1. Slide current term out to the LEFT
+      gsap.to(el, {
+        x: -55, opacity: 0,
+        duration: 0.22, ease: "power3.in",
+        onComplete: () => {
+          orbIdxRef.current = (orbIdxRef.current + 1) % ORB_TERMS.length;
+          const next = ORB_TERMS[orbIdxRef.current];
+          el.textContent = next;
+
+          // Dynamic font-size so longer terms fit inside the orb
+          const base = 36;
+          el.style.fontSize = Math.min(base, Math.max(14, base * (5 / Math.max(5, next.length)))) + "px";
+
+          // 2. Fly in from the RIGHT with elastic magnetic snap
+          gsap.fromTo(el,
+            { x: 65, opacity: 0, scale: 1.12 },
+            {
+              x: 0, opacity: 1, scale: 1,
+              duration: 0.8,
+              ease: "elastic.out(1.3, 0.38)",
+              onComplete: () => {
+                // 3. Physical vibration shimmy on landing
+                gsap.fromTo(el, { x: 0 }, {
+                  keyframes: [
+                    { x:  5, duration: 0.04 },
+                    { x: -4, duration: 0.04 },
+                    { x:  3, duration: 0.038 },
+                    { x: -2, duration: 0.035 },
+                    { x:  0, duration: 0.03  },
+                  ],
+                  ease: "none",
+                });
+              },
+            }
+          );
+        },
+      });
+    }
+
+    // Start cycling: first at 3 s (orb entrance done), then every 2.8 s
+    const timer   = setTimeout(() => {
+      cycleOrbTerm();
+      const intvl = setInterval(cycleOrbTerm, 2800);
+      // Store for cleanup
+      (orbRef.current as any).__orbIntvl = intvl;
+    }, 3000);
+    (orbRef.current as any).__orbTimer = timer;
+
     return () => {
-      document.body.style.overflowX = '';
+      ctx.revert();
+      if (orbRef.current) {
+        clearTimeout((orbRef.current as any).__orbTimer);
+        clearInterval((orbRef.current as any).__orbIntvl);
+      }
     };
-  }, []); // The empty array [] ensures this runs only once when the component mounts.
-
-  // Effect to check screen size for performance optimization
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 768); // 768px is the 'md' breakpoint
-    };
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
+  return (
+    <div className="relative w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 pointer-events-none select-none">
+      {/* Static orbit rings */}
+      <svg className="absolute inset-0 w-full h-full" fill="none">
+        <circle cx="50%" cy="50%" r="35%" stroke="rgba(98,170,222,0.08)" strokeWidth="1" />
+        <circle cx="50%" cy="50%" r="25%" stroke="rgba(98,170,222,0.06)" strokeWidth="1" />
+      </svg>
+      {/* Spinning ring 1 */}
+      <div ref={ring1Ref} className="absolute inset-[20%] border border-[#62AADE]/30 rounded-full" style={{ transformStyle: "preserve-3d" }} />
+      {/* Spinning ring 2 */}
+      <div ref={ring2Ref} className="absolute inset-[20%] border border-[#163791]/40 rounded-full" style={{ transformStyle: "preserve-3d" }} />
+      {/* Pulse ring */}
+      <div ref={pulseRef} className="absolute inset-0 border border-[#62AADE]/25 rounded-full" />
+      {/* Core glow */}
+      <div ref={orbRef} className="absolute inset-[30%] rounded-full" style={{ background: "radial-gradient(circle, rgba(22,55,145,0.7) 0%, rgba(98,170,222,0.3) 60%, transparent 100%)", boxShadow: "0 0 40px 8px rgba(22,55,145,0.5), 0 0 80px 15px rgba(98,170,222,0.15)", transformOrigin: "center" }}>
+        {/* overflow-hidden + rounded-full clips the text slide to the circular area */}
+        <div className="absolute inset-0 flex items-center justify-center overflow-hidden rounded-full">
+          <span
+            ref={orbTextRef}
+            className="font-black tracking-tight select-none"
+            style={{
+              background: "linear-gradient(135deg, #ffffff, #62AADE)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              fontSize: 36,
+              display: "inline-block",
+              willChange: "transform, opacity",
+              whiteSpace: "nowrap",
+            }}
+          >
+            AI
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  // --- PARTICLE BACKGROUND LOGIC ---
+// ─── Ambient Mirror Glitch ─────────────────────────────────────────────
+// Starts 2 s after mount (well after entry animation is done).
+// Picks characters ONLY from "INDUSTRIAL SYSTEMS" and briefly swaps them
+// with their Unicode mirror equivalent (e.g., R→Я, N→И, S→ƨ, E→Ǝ, M→W)
+// then snaps back. Slow, intentional, feels like live encrypted data.
+function startMirrorGlitch(el: HTMLElement, fullText: string): () => void {
+  // Unicode reversed/mirrored equivalents of uppercase letters
+  const MIRROR: Record<string, string> = {
+    R: '\u042f', // Я
+    N: '\u0418', // И
+    S: '\u01a8', // Ƨ
+    E: '\u018e', // Ǝ
+    M: 'W',
+    U: '\u2229', // ∩
+    A: '\u0245', // Ʌ
+    D: '\u1441', // ᑁ
+    Y: '\u028e', // ʎ
+    I: '\u026a', // ɪ (small caps I)
+    L: '\u2310', // ⌐
+  };
+
+  // "FOR SMARTER " = 12 characters, so INDUSTRIAL SYSTEMS starts at index 12
+  const TARGET_OFFSET = 12;
+  const validIdx: number[] = [];
+  Array.from(fullText).forEach((ch, i) => {
+    if (i >= TARGET_OFFSET && ch !== ' ' && MIRROR[ch]) validIdx.push(i);
+  });
+
+  let raf: number;
+  let timer: ReturnType<typeof setTimeout>;
+  let running = true;
+
+  function glitch() {
+    if (!running) return;
+    const pos = validIdx[Math.floor(Math.random() * validIdx.length)];
+    const mirror = MIRROR[fullText[pos]];
+    // Hold mirror char for 10–18 frames (~167–300 ms at 60fps) — slow, deliberate
+    let frames = 10 + Math.floor(Math.random() * 9);
+
+    function flicker() {
+      if (!running) { el.textContent = fullText; return; }
+      const chars = Array.from(el.textContent ?? fullText);
+      if (frames-- > 0) {
+        chars[pos] = mirror;
+        el.textContent = chars.join('');
+        raf = requestAnimationFrame(flicker);
+      } else {
+        // Snap back to correct char
+        chars[pos] = fullText[pos];
+        el.textContent = chars.join('');
+        // Wait 1.5–3.8 s before next glitch
+        timer = setTimeout(
+          () => { if (running) raf = requestAnimationFrame(glitch); },
+          1500 + Math.random() * 2300
+        );
+      }
+    }
+    raf = requestAnimationFrame(flicker);
+  }
+
+  // Start 2 s after mount — entry animation will be done by then
+  timer = setTimeout(() => { if (running) raf = requestAnimationFrame(glitch); }, 2000);
+
+  return () => {
+    running = false;
+    cancelAnimationFrame(raf);
+    clearTimeout(timer);
+    el.textContent = fullText;
+  };
+}
+
+// ─── Main Hero ──────────────────────────────────────────────────────────────
+export default function HeroScene() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const line1Ref = useRef<HTMLSpanElement>(null);
+  const line2Ref = useRef<HTMLSpanElement>(null);
+  const subRef = useRef<HTMLParagraphElement>(null);
+  const ctaRef = useRef<HTMLDivElement>(null);
+  const orbWrapRef = useRef<HTMLDivElement>(null);
+  const scrambleStop = useRef<(() => void) | null>(null);
+
+  // ── Entrance timeline ──
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const context = ctx as CanvasRenderingContext2D;
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: EASE_POWER4 } });
 
-    if (isMobile) {
-      ctx.fillStyle = '#09090b';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      return;
+      // Badge — pop up with spring
+      tl.from(badgeRef.current, { y: 40, opacity: 0, scale: 0.82, duration: 0.75, ease: EASE_BACK }, 0.1);
+
+      // Line 1 — slide up from clip
+      tl.from(line1Ref.current, { y: "100%", opacity: 0, duration: 0.75 }, 0.38);
+
+      // Line 2 — clean slide up on entry, mirror glitch starts after 2 s separately
+      tl.from(line2Ref.current, { y: "100%", opacity: 0, duration: 0.85 }, 0.56);
+
+      // Sub paragraph
+      tl.from(subRef.current, { y: 28, opacity: 0, duration: 0.6 }, 1.0);
+
+      // CTA buttons stagger
+      tl.from(ctaRef.current?.children ?? [], { y: 28, opacity: 0, scale: 0.9, duration: 0.55, stagger: 0.1, ease: EASE_BACK }, 1.15);
+
+      // Orb
+      tl.from(orbWrapRef.current, { scale: 0.4, opacity: 0, duration: 1.0, ease: EASE_SPRING }, 1.35);
+
+      // Parallax on scroll — hero text drifts up
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: "top top",
+        end: "bottom top",
+        scrub: 1.5,
+        onUpdate: (self) => {
+          if (!sectionRef.current) return;
+          const p = self.progress;
+          const textEls = sectionRef.current.querySelectorAll(".hero-parallax");
+          gsap.set(textEls, { y: p * 70 });
+        },
+      });
+    }, sectionRef);
+
+    // Start mirror glitch AFTER entry animation settles (handled by 2 s internal delay)
+    if (line2Ref.current) {
+      scrambleStop.current = startMirrorGlitch(line2Ref.current, "FOR SMARTER INDUSTRIAL SYSTEMS");
     }
 
-    let animationFrameId: number;
-    let particles: any[];
-    // Use secondary color (Blue) for particles so they are visible on black background
-    const primaryColorHsl = getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim() || '224 73% 33%';
-
-    class Particle {
-      x: number; y: number; size: number; speedX: number; speedY: number;
-      constructor(x: number, y: number, size: number, speedX: number, speedY: number) { this.x = x; this.y = y; this.size = size; this.speedX = speedX; this.speedY = speedY; }
-      update(width: number, height: number) {
-        if (this.x > width || this.x < 0) this.speedX = -this.speedX;
-        if (this.y > height || this.y < 0) this.speedY = -this.speedY;
-        this.x += this.speedX; this.y += this.speedY;
-      }
-      draw() {
-        context.fillStyle = `hsl(${primaryColorHsl} / 1.0)`;
-        context.beginPath(); context.arc(this.x, this.y, this.size, 0, Math.PI * 2); context.fill();
-      }
-    }
-
-    const init = () => {
-      const dpr = window.devicePixelRatio || 1;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      canvas.width = width * dpr;
-      canvas.height = height * dpr;
-      canvas.style.width = `${width}px`;
-      canvas.style.height = `${height}px`;
-      context.scale(dpr, dpr);
-      particles = [];
-      const numberOfParticles = Math.floor((width * height) / 25000);
-      for (let i = 0; i < numberOfParticles; i++) {
-        const size = Math.random() * 1.5 + 0.5;
-        const x = Math.random() * width;
-        const y = Math.random() * height;
-        const speedX = (Math.random() * 0.3) - 0.15;
-        const speedY = (Math.random() * 0.3) - 0.15;
-        particles.push(new Particle(x, y, size, speedX, speedY));
-      }
-    };
-
-    const animate = () => {
-      if (!particles) return;
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      context.fillStyle = '#09090b';
-      context.fillRect(0, 0, width, height);
-      particles.forEach(p => { p.update(width, height); p.draw(); });
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    init();
-    animate();
-    window.addEventListener('resize', init);
     return () => {
-      window.removeEventListener('resize', init);
-      cancelAnimationFrame(animationFrameId);
+      scrambleStop.current?.();
+      ctx.revert();
     };
-  }, [isMobile]);
-
+  }, []);
 
   return (
     <>
-      <style>{keyframesCSS}</style>
-      <section id="home" className="relative min-h-[100svh] overflow-hidden pt-24 pb-2 sm:pb-4">
-        <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full -z-10" />
+      <style>{`
+        @keyframes rotateAurora { from { transform: translate(-50%,-50%) rotate(0deg); } to { transform: translate(-50%,-50%) rotate(360deg); } }
+        @keyframes auroraShift {
+          0%,100% { transform: translate(0%,0%) scale(1); opacity: 0.15; }
+          33% { transform: translate(3%,-4%) scale(1.05); opacity: 0.22; }
+          66% { transform: translate(-2%,3%) scale(0.97); opacity: 0.18; }
+        }
+      `}</style>
 
-        <div className="min-h-[calc(100svh-10rem)] flex items-center justify-center">
-          <div className="relative z-10 max-w-7xl mx-auto px-4 text-center">
-            <div className="max-w-6xl mx-auto">
-              {/* Badge, Headline, Subtitle, and Buttons... */}
-              <div>
-                <div className="relative inline-flex items-center justify-center p-0.5 mb-8 overflow-hidden rounded-full">
-                  <div className="absolute top-1/2 left-1/2 w-[200%] h-[400%]" style={{ background: 'conic-gradient(from 0deg at 50% 50%, hsl(var(--primary)/0.5), hsl(var(--primary)/0), hsl(var(--primary)/0.5))', animation: 'rotateAurora 4s linear infinite' }} />
-                  <div className="relative flex items-center px-6 py-3 rounded-full bg-zinc-900/90 backdrop-blur-sm">
-                    <Sparkles className="w-4 h-4 mr-2 text-tertiary" />
-                    <span className="text-sm font-semibold tracking-wider uppercase text-foreground">Next-Gen Industrial Intelligence</span>
-                  </div>
+      <section id="home" ref={sectionRef} className="relative min-h-[100svh] overflow-hidden pt-24 pb-2 sm:pb-4">
+
+        {/* Deep space gradient */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(22,55,145,0.25) 0%, transparent 70%)", zIndex: 1 }} />
+
+        {/* Drifting aurora blobs */}
+        <div className="absolute pointer-events-none" style={{ inset: 0, overflow: "hidden", zIndex: 1 }}>
+          <div style={{ position: "absolute", top: "15%", left: "20%", width: "55vw", height: "55vw", borderRadius: "50%", background: "radial-gradient(circle, rgba(22,55,145,0.35) 0%, transparent 70%)", animation: "auroraShift 14s ease-in-out infinite", filter: "blur(60px)" }} />
+          <div style={{ position: "absolute", top: "40%", right: "10%", width: "35vw", height: "35vw", borderRadius: "50%", background: "radial-gradient(circle, rgba(98,170,222,0.18) 0%, transparent 70%)", animation: "auroraShift 18s ease-in-out infinite reverse", filter: "blur(50px)" }} />
+        </div>
+
+        {/* Static noise texture — no animation to prevent blinking */}
+        <div className="absolute inset-0 pointer-events-none" style={{
+          zIndex: 2, opacity: 0.03,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`
+        }} />
+
+        {/* Content */}
+        <div className="relative min-h-[calc(100svh-10rem)] flex items-center justify-center" style={{ zIndex: 2 }}>
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <div className="max-w-6xl mx-auto hero-parallax">
+
+              {/* Badge */}
+              <div ref={badgeRef} className="hero-parallax relative inline-flex items-center justify-center p-[1.5px] mb-8 overflow-hidden rounded-full" style={{ background: "transparent" }}>
+                <div className="absolute top-1/2 left-1/2 w-[200%] h-[400%]" style={{ background: "conic-gradient(from 0deg at 50% 50%, rgba(98,170,222,0.6), rgba(22,55,145,0.2), rgba(98,170,222,0.6))", animation: "rotateAurora 4s linear infinite" }} />
+                <div className="relative flex items-center px-6 py-3 rounded-full" style={{ background: "rgba(6,13,31,0.9)", backdropFilter: "blur(12px)" }}>
+                  <Sparkles className="w-4 h-4 mr-2" style={{ color: "#62AADE" }} />
+                  <span className="text-sm font-semibold tracking-wider uppercase" style={{ color: "#ffffff" }}>Next-Gen Industrial Intelligence</span>
                 </div>
               </div>
+
+              {/* Headline — each line wrapped in overflow:hidden container for clip-reveal */}
               <div>
-                <h1 className="text-3xl sm:text-5xl md:text-7xl font-black leading-tight tracking-tighter mb-6">
-                  <span className="block">AI AGENTS & DATA INFRA</span>
-                  <span className="block text-secondary">FOR SMARTER INDUSTRIAL SYSTEMS</span>
+                <h1 className="text-3xl sm:text-5xl md:text-7xl font-black leading-[1.1] tracking-tighter mb-6">
+                  <span className="block overflow-hidden">
+                    <span ref={line1Ref} className="block text-white">AI AGENTS &amp; DATA INFRA</span>
+                  </span>
+                  <span className="block overflow-hidden">
+                    <span
+                      ref={line2Ref}
+                      className="block"
+                      style={{
+                        background: "linear-gradient(135deg, #1a4fa8 0%, #2560c8 40%, #4a8fd4 75%, #62AADE 100%)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                        backgroundClip: "text",
+                        paddingBottom: "0.05em",
+                      }}
+                    >
+                      FOR SMARTER INDUSTRIAL SYSTEMS
+                    </span>
+                  </span>
                 </h1>
               </div>
-              <div>
-                <p className="text-lg md:text-xl max-w-4xl mx-auto leading-relaxed text-zinc-300 mb-10">
-                  We combine machine-level optimization with domain-specific intelligence to automate decisions, enhance transparency, and create datasets that fuel the next generation of robotics.
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+
+              {/* Sub */}
+              <p ref={subRef} className="text-lg md:text-xl max-w-4xl mx-auto leading-relaxed mb-10 hero-parallax" style={{ color: "rgba(255,255,255,0.65)" }}>
+                We combine machine-level optimization with domain-specific intelligence to automate decisions, enhance transparency, and create datasets that fuel the next generation of robotics.
+              </p>
+
+              {/* CTAs */}
+              <div ref={ctaRef} className="flex flex-col sm:flex-row gap-4 justify-center items-center hero-parallax">
                 <a href="https://calendly.com/nikhilg-autonexai360/30min" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                  <button className="group relative text-base px-8 py-4 rounded-full font-bold transition-transform duration-300 hover:scale-105 flex items-center overflow-hidden bg-secondary text-secondary-foreground w-full sm:w-auto shadow-[0_0_40px_hsl(var(--secondary)/0.4)]">
-                    <span className="relative z-10 flex items-center justify-center gap-2">Discover Our Platform <ArrowRight className="h-5 w-5 group-hover:translate-x-1" /></span>
+                  <button
+                    id="hero-cta-primary"
+                    className="group relative text-base px-8 py-4 rounded-full font-bold w-full sm:w-auto overflow-hidden flex items-center justify-center gap-2 transition-transform duration-200 hover:scale-105 active:scale-95"
+                    style={{ background: "linear-gradient(135deg, #163791 0%, #62AADE 100%)", boxShadow: "0 0 40px rgba(22,55,145,0.5), 0 0 80px rgba(98,170,222,0.2)", color: "#fff" }}
+                    onMouseEnter={(e) => { gsap.to(e.currentTarget.querySelector(".btn-shimmer"), { x: "200%", duration: 0.5, ease: "power2.inOut" }); }}
+                    onMouseLeave={(e) => { gsap.set(e.currentTarget.querySelector(".btn-shimmer"), { x: "-100%" }); }}
+                  >
+                    <div className="btn-shimmer absolute inset-0 w-1/3 skew-x-[-20deg]" style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)", transform: "translateX(-100%)" }} />
+                    <span className="relative z-10 flex items-center gap-2">Discover Our Platform <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" /></span>
                   </button>
                 </a>
                 <a href="/contact" className="w-full sm:w-auto">
-                  <button className="group text-base px-8 py-4 rounded-full font-bold transition-all duration-300 hover:scale-105 flex items-center backdrop-blur-sm bg-white/5 border-2 border-white/10 text-zinc-100 w-full sm:w-auto">
-                    <Users className="mr-2 h-5 w-5 group-hover:scale-110" /> Join as a Partner
+                  <button
+                    id="hero-cta-secondary"
+                    className="group text-base px-8 py-4 rounded-full font-bold flex items-center justify-center gap-2 w-full sm:w-auto transition-all duration-200 hover:scale-105 active:scale-95"
+                    style={{ background: "rgba(255,255,255,0.05)", border: "1.5px solid rgba(98,170,222,0.3)", color: "#fff", backdropFilter: "blur(12px)" }}
+                    onMouseEnter={(e) => { gsap.to(e.currentTarget, { borderColor: "rgba(98,170,222,0.7)", boxShadow: "0 0 20px rgba(98,170,222,0.2)", duration: 0.3 }); }}
+                    onMouseLeave={(e) => { gsap.to(e.currentTarget, { borderColor: "rgba(98,170,222,0.3)", boxShadow: "none", duration: 0.3 }); }}
+                  >
+                    <Users className="h-5 w-5 transition-transform group-hover:scale-110" />
+                    Join as a Partner
                   </button>
                 </a>
               </div>
 
-              {/* Inline AI Logo container shown directly under CTAs, responsive and centered */}
-              <div className="mt-16 sm:mt-20 mb-8 sm:mb-10 flex justify-center">
-                <div className="relative w-40 h-40 sm:w-56 sm:h-56 md:w-72 md:h-72 pointer-events-none select-none">
-                  <div className="absolute inset-0">
-                    <svg className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <circle cx="50%" cy="50%" r="35%" className="stroke-secondary/10" strokeWidth="1" />
-                      <circle cx="50%" cy="50%" r="25%" className="stroke-secondary/10" strokeWidth="1" />
-                    </svg>
-                  </div>
-                  <div className="absolute inset-[35%] rounded-full bg-secondary/20 shadow-[0_0_30px_5px_hsl(var(--secondary)/0.3)]">
-                    <div className="absolute inset-4 rounded-full bg-secondary/30 shadow-[inset_0_0_10px_hsl(var(--secondary))] flex items-center justify-center text-secondary-foreground font-bold text-3xl sm:text-4xl">AI</div>
-                  </div>
-                  <div className="absolute inset-[20%] border border-secondary/30 rounded-full" style={{ transform: 'rotateX(75deg)' }} />
-                  <div className="absolute inset-[20%] border border-secondary/30 rounded-full" style={{ transform: 'rotateY(75deg)' }} />
-                  <div className="absolute inset-0 border border-secondary/20 rounded-full" />
-                </div>
+              {/* Orb */}
+              <div ref={orbWrapRef} className="mt-16 sm:mt-20 mb-8 flex justify-center hero-parallax">
+                <HeroOrb />
               </div>
+
             </div>
           </div>
         </div>
-
       </section>
     </>
   );
