@@ -253,6 +253,75 @@ export default function ServicesScene() {
     return () => ctx.revert();
   }, [transitionTo, playVideo]);
 
+  // ── Mobile: auto-advance + touch swipe ───────────────────────────────────
+  useEffect(() => {
+    if (window.innerWidth >= 1024) return; // desktop handled by GSAP pin
+
+    const section = sectionRef.current;
+    if (!section) return;
+
+    let autoTimer: ReturnType<typeof setTimeout>;
+
+    const goTo = (idx: number, dir: 1 | -1 = 1) => {
+      if (transitingRef.current) return;
+      activeIdxRef.current = idx;
+      setActive(idx);
+      playVideo(idx);
+      // Slide content in from appropriate direction
+      if (contentRef.current) {
+        gsap.fromTo(
+          contentRef.current.querySelectorAll('.psc-item'),
+          { x: dir > 0 ? 40 : -40, opacity: 0 },
+          { x: 0, opacity: 1, stagger: 0.05, duration: 0.4, ease: 'power3.out' }
+        );
+      }
+      if (frameRef.current) {
+        gsap.fromTo(frameRef.current,
+          { opacity: 0.65, scale: 0.96 },
+          { opacity: 1, scale: 1, duration: 0.4, ease: 'power3.out' }
+        );
+      }
+    };
+
+    const scheduleNext = () => {
+      clearTimeout(autoTimer);
+      autoTimer = setTimeout(() => {
+        const next = (activeIdxRef.current + 1) % PRODUCTS.length;
+        goTo(next, 1);
+        scheduleNext();
+      }, 4000);
+    };
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const onTouchEnd = (e: TouchEvent) => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      const dy = e.changedTouches[0].clientY - touchStartY;
+      // Must be more horizontal than vertical and >= 40px
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      const dir = dx < 0 ? 1 : -1;
+      const next = (activeIdxRef.current + dir + PRODUCTS.length) % PRODUCTS.length;
+      goTo(next, dir as 1 | -1);
+      scheduleNext(); // reset timer so it doesn't fire right after swipe
+    };
+
+    section.addEventListener('touchstart', onTouchStart, { passive: true });
+    section.addEventListener('touchend',   onTouchEnd,   { passive: true });
+    scheduleNext();
+
+    return () => {
+      clearTimeout(autoTimer);
+      section.removeEventListener('touchstart', onTouchStart);
+      section.removeEventListener('touchend',   onTouchEnd);
+    };
+  }, [playVideo]);
+
   const p = PRODUCTS[active];
   const Icon = p.icon;
 
@@ -496,6 +565,38 @@ export default function ServicesScene() {
                 }}
               />
             </div>
+          </div>
+
+          {/* ── Mobile dot indicators ──────────────────────────────────── */}
+          <div className="flex lg:hidden justify-center items-center gap-2 mt-3 mb-1">
+            {PRODUCTS.map((prod, i) => (
+              <button
+                key={prod.id}
+                onClick={() => {
+                  const dir = i > active ? 1 : -1;
+                  activeIdxRef.current = i;
+                  setActive(i);
+                  playVideo(i);
+                  if (contentRef.current)
+                    gsap.fromTo(
+                      contentRef.current.querySelectorAll('.psc-item'),
+                      { x: dir > 0 ? 40 : -40, opacity: 0 },
+                      { x: 0, opacity: 1, stagger: 0.05, duration: 0.38, ease: 'power3.out' }
+                    );
+                }}
+                style={{
+                  width:  i === active ? 22 : 7,
+                  height: 7,
+                  borderRadius: 4,
+                  background: i === active ? prod.color : 'rgba(255,255,255,0.18)',
+                  border: 'none',
+                  padding: 0,
+                  cursor: 'pointer',
+                  transition: 'width 0.35s ease, background 0.35s ease',
+                }}
+                aria-label={`Go to ${prod.name}`}
+              />
+            ))}
           </div>
 
           {/* ── RIGHT: Content ─────────────────────────────────────────────── */}
