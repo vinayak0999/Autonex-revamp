@@ -135,7 +135,7 @@ function getCardStyle(pos: number, total: number, w: number, h: number, offset: 
     position: "absolute",
     width: w,
     height: h,
-    left: fromFront * offset,
+    left: stackUpOnly ? 0 : fromFront * offset,  // mobile = pure vertical stack
     top:  -fromFront * offset,
     zIndex: pos + 1,
     opacity: 1 - fromFront * 0.1,
@@ -296,7 +296,8 @@ export default function IndustriesScene() {
           className="ind-deck-wrapper flex-shrink-0 select-none"
           style={{
             paddingTop: maxOffset,
-            paddingRight: maxOffset,
+            // On mobile: cards stack upward only, no horizontal spread needed
+            paddingRight: dims.w < BASE_CARD_W ? 0 : maxOffset,
             position: "relative",
           }}
         >

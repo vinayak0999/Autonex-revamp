@@ -45,6 +45,17 @@ export default function GettingStarted() {
     const planeEl = planeRef.current;
     if (!section || !svgEl || !railEl || !pathEl || !planeEl) return;
 
+    // ── Apply vertical stagger on sm+ screens ────────────────────────────
+    // NODE_Y [150, 80, 10] was designed for yOffset [140, 70, 0].
+    // The inline style has marginTop:0; we override it here for desktop.
+    if (window.innerWidth >= 640) {
+      const allCards = section.querySelectorAll<HTMLElement>(".gs-card");
+      allCards.forEach(card => {
+        const margin = parseInt(card.getAttribute("data-sm-margin") || "0", 10);
+        card.style.marginTop = `${margin}px`;
+      });
+    }
+
     // Build path AFTER layout so we know the actual pixel width
     requestAnimationFrame(() => {
       // Skip SVG path animation on mobile — cards still animate in via scroll
@@ -159,7 +170,7 @@ export default function GettingStarted() {
         </div>
 
         {/* ── Flight path + staggered cards ───────────────────────────────────── */}
-        <div style={{ position: "relative", minHeight: 460 }}>
+        <div style={{ position: "relative", minHeight: 560 }}>
 
           {/* SVG thread — no viewBox, real pixel coordinates set by JS */}
           <svg
