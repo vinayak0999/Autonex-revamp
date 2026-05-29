@@ -9,7 +9,7 @@ const steps = [
     heading:   "Discovery",
     body:      "Share your existing camera or sensor feeds. Tell us your biggest pain point. We define KPIs for your POC together — so you know exactly what you're measuring.",
     color:     "#60a5fa",
-    yOffset:   0,
+    yOffset:   140,
   },
   {
     timeframe: "Week 2 – 4",
@@ -23,12 +23,12 @@ const steps = [
     heading:   "Go Live",
     body:      "Real-time dashboard and alerts from day one. AI models upgrade automatically as they learn your facility. No hidden costs beyond AMC.",
     color:     "#2dd4bf",
-    yOffset:   140,
+    yOffset:   0,
   },
 ];
 
 // Node dot center Y in SVG pixel space (yOffset + half of 20px node)
-const NODE_Y = [10, 80, 150];
+const NODE_Y = [150, 80, 10];
 
 export default function GettingStarted() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -163,7 +163,7 @@ export default function GettingStarted() {
               position: "absolute",
               top: 0, left: 0,
               width: "100%",
-              height: 180,           // covers NODE_Y[2]=150 + breathing room
+              height: 180,
               overflow: "visible",
               pointerEvents: "none",
               zIndex: 10,

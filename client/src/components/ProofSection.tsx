@@ -16,7 +16,7 @@ const results = [
     glow:        "rgba(96,165,250,0.22)",
   },
   {
-    metric:      "–50%",
+    metric:      "– 50%",
     suffix:      "%",
     countTo:     50,
     label:       "Safety Incidents",
@@ -38,7 +38,7 @@ const results = [
     glow:        "rgba(167,139,250,0.22)",
   },
   {
-    metric:      "–70%",
+    metric:      "– 70%",
     suffix:      "%",
     countTo:     70,
     label:       "Stock Retrieval Time",
@@ -80,7 +80,7 @@ export default function ProofSection() {
           ease: "power3.out",
           scrollTrigger: { trigger: card, start: "top 85%", once: true },
           onUpdate() {
-            const prefix = r.metric.startsWith("+") ? "+" : r.metric.startsWith("–") ? "–" : "";
+            const prefix = r.metric.startsWith("+") ? "+" : r.metric.startsWith("–") ? "– " : "";
             metricEl.textContent = `${prefix}${Math.round(obj.val)}${r.suffix}`;
           },
           onComplete() { metricEl.textContent = r.metric; },
@@ -159,20 +159,20 @@ export default function ProofSection() {
 
       <div className="max-w-6xl mx-auto relative">
 
-        {/* ── Header ──────────────────────────────────────────────────────── */}
-        <div className="text-center mb-16">
+        {/* ── Header ────────────────────────────────────────────────── */}
+        <div className="text-center mb-24">
           <p className="text-[11px] font-black tracking-[0.28em] uppercase mb-4"
             style={{ color: "#60a5fa" }}>
             Proof, Not Promises
           </p>
-          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-4"
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.05] mb-6"
             style={{ letterSpacing: "-0.025em" }}>
-            INR 10 Cr+ saved.<br />
+            Live results.<br />
             <span style={{ color: "#60a5fa" }}>Real factories.</span> Real numbers.
           </h2>
-          <p className="text-base max-w-xl mx-auto" style={{ color: "rgba(255,255,255,0.38)" }}>
-            No stock photos. No fabricated case studies.<br />
-            Client names in two months — results are live right now.
+          <p className="text-base max-w-xl mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.55)" }}>
+            Every number below comes from a live Autonex deployment.<br />
+            Real clients. Real shop floors. Measured from day one.
           </p>
         </div>
 
@@ -231,7 +231,7 @@ export default function ProofSection() {
                   {/* Product + Industry */}
                   <div className="flex items-center justify-between mb-8">
                     <span
-                      className="text-[9px] font-black tracking-[0.22em] uppercase px-2.5 py-1 rounded-full"
+                      className="text-[11px] font-black tracking-[0.18em] uppercase px-3 py-1.5 rounded-full whitespace-nowrap"
                       style={{
                         background: `${r.color}18`,
                         border:     `1px solid ${r.color}40`,
@@ -240,7 +240,7 @@ export default function ProofSection() {
                     >
                       {r.product}
                     </span>
-                    <span className="text-[9px] tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.2)" }}>
+                    <span className="text-[11px] tracking-widest uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>
                       {r.industry}
                     </span>
                   </div>
@@ -258,8 +258,8 @@ export default function ProofSection() {
 
                   {/* Label */}
                   <div
-                    className="text-xs font-bold uppercase tracking-[0.18em] mb-5"
-                    style={{ color: "rgba(255,255,255,0.45)" }}
+                    className="text-sm font-bold uppercase tracking-[0.15em] mb-5"
+                    style={{ color: "rgba(255,255,255,0.6)" }}
                   >
                     {r.label}
                   </div>
@@ -269,7 +269,7 @@ export default function ProofSection() {
                     style={{ background: `linear-gradient(to right, ${r.color}40, transparent)` }} />
 
                   {/* Description */}
-                  <p className="text-[13px] leading-relaxed flex-1" style={{ color: "rgba(255,255,255,0.45)" }}>
+                  <p className="text-sm leading-relaxed flex-1" style={{ color: "rgba(255,255,255,0.6)" }}>
                     {r.description}
                   </p>
 
@@ -290,11 +290,24 @@ export default function ProofSection() {
           ))}
         </div>
 
-        {/* ── Bottom callout ───────────────────────────────────────────────── */}
-        <div className="mt-14 text-center">
-          <p className="text-sm" style={{ color: "rgba(255,255,255,0.25)" }}>
-            Across pharma · textile · packaging · automotive — all standalone modules, no big-bang commitment
-          </p>
+        {/* ── Bottom callout ─────────────────────────────────────────────── */}
+        <div className="mt-16 text-center">
+          <div
+            className="inline-flex flex-wrap justify-center items-center gap-3 px-6 py-3 rounded-full"
+            style={{
+              background: "rgba(96,165,250,0.06)",
+              border: "1px solid rgba(96,165,250,0.18)",
+            }}
+          >
+            {["Pharma", "Textile", "Packaging", "Automotive"].map((sector, i, arr) => (
+              <span key={sector} className="flex items-center gap-3">
+                <span className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.7)" }}>{sector}</span>
+                {i < arr.length - 1 && <span style={{ color: "rgba(96,165,250,0.4)", fontSize: 10 }}>&#9679;</span>}
+              </span>
+            ))}
+            <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 12 }}>|</span>
+            <span className="text-xs font-medium" style={{ color: "rgba(96,165,250,0.8)" }}>All standalone — start with one module</span>
+          </div>
         </div>
 
       </div>
