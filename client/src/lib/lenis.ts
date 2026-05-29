@@ -30,8 +30,9 @@ export function initLenis() {
     // Smooth wheel input across browsers
     smoothWheel: true as any,
 
-    // Enable Lenis-managed touch scroll on mobile for GSAP sync
-    smoothTouch: true as any,
+    // Keep native touch on mobile — Lenis lerp conflicts with iOS native scroll
+    // causing random UI flicker. Native scroll + ScrollTrigger.update() is enough.
+    smoothTouch: false as any,
 
     // Normalize mouse-wheel delta for consistent cross-browser speed
     normalizeWheel: true as any,

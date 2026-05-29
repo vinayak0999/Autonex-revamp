@@ -40,13 +40,6 @@ export default function Header() {
       });
     });
 
-    // ── Set initial state of the always-mounted menu overlay ──────────────
-    // This must happen synchronously in the mount effect so the overlay
-    // is invisible from frame 0 (no React-conditional-render flash).
-    if (overlayRef.current)   gsap.set(overlayRef.current,   { autoAlpha: 0, pointerEvents: "none" });
-    if (scrimRef.current)     gsap.set(scrimRef.current,     { opacity: 0 });
-    if (menuPanelRef.current) gsap.set(menuPanelRef.current, { x: "100%", opacity: 0 });
-
     return () => ctx.revert();
   }, []);
 
@@ -59,14 +52,14 @@ export default function Header() {
     if (!overlay || !scrim || !panel) return;
 
     if (menuOpen) {
-      // ── OPEN ─────────────────────────────────────────────────────────────
-      stopLenis(); // prevent body scroll behind the overlay
-      gsap.set(overlay, { autoAlpha: 1, pointerEvents: "auto" });
-      gsap.to(scrim,  { opacity: 1, duration: 0.25, ease: "power2.out" });
-      gsap.fromTo(
-        panel,
+      // ── OPEN ────────────────────────────────────────────────────
+      stopLenis();
+      gsap.set(overlay, { visibility: "visible", pointerEvents: "auto" });
+      gsap.to(scrim, { opacity: 1, duration: 0.25, ease: "power2.out" });
+      // fromTo ensures GSAP doesn't rely on reading CSS transform
+      gsap.fromTo(panel,
         { x: "100%", opacity: 0 },
-        { x: "0%",   opacity: 1, duration: 0.45, ease: "power3.out" }
+        { x: "0%",   opacity: 1, duration: 0.45, ease: "power3.out", clearProps: "transform" }
       );
       if (list) {
         gsap.from(list.querySelectorAll("li"), {
@@ -79,7 +72,7 @@ export default function Header() {
       gsap.to(panel, {
         x: "100%", opacity: 0, duration: 0.35, ease: "power3.in",
         onComplete: () => {
-          gsap.set(overlay, { autoAlpha: 0, pointerEvents: "none" });
+          gsap.set(overlay, { visibility: "hidden", pointerEvents: "none" });
           startLenis(); // re-enable body scroll after overlay is gone
         },
       });
@@ -140,11 +133,12 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ── Menu overlay — ALWAYS MOUNTED, GSAP controls visibility ────────── */}
-      {/* No conditional rendering = no React-mount-frame flash              */}
+      {/* ── Menu overlay — ALWAYS MOUNTED, GSAP controls visibility ─────────
+          Initial state via inline CSS so it’s invisible from frame 0.    */}
       <div
         ref={overlayRef}
         className="fixed inset-0 z-[60]"
+        style={{ visibility: "hidden", pointerEvents: "none" }}
         aria-hidden={!menuOpen}
       >
         {/* Scrim — solid background, no backdrop-blur (avoids GPU repaint) */}
@@ -162,9 +156,11 @@ export default function Header() {
             ref={menuPanelRef}
             className="pointer-events-auto absolute inset-0 text-white shadow-2xl flex flex-col"
             style={{
-              background: "rgba(6,13,31,0.95)",
-              backdropFilter: "blur(20px)",
+              background: "rgba(6,13,31,0.98)",
               border: "1px solid rgba(98,170,222,0.2)",
+              // Initial state: invisible at frame 0 — GSAP will animate from here
+              opacity: 0,
+              transform: "translateX(100%)",
             }}
           >
             <div className="p-3 self-end">
