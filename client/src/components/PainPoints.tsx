@@ -118,6 +118,9 @@ export default function PainPoints() {
   const sectionRef = useRef<HTMLElement>(null);
   const cardsRef   = useRef<(HTMLDivElement | null)[]>([]);
 
+  // Detect touch/mobile once — used to skip expensive GPU operations
+  const isMobile = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
+
   // Fixed useGSAP call — signature is (fn, scopeRef, deps)
   useGSAP(() => {
     // 3D stacking: as next card scrolls up, current card scales back & blurs
@@ -129,7 +132,9 @@ export default function PainPoints() {
         scale:   0.92,
         y:       -40,
         opacity: 0.3,
-        filter:  "blur(8px)",
+        // Animated filter:blur on every scroll frame = repaint per tick → biggest mobile lag.
+        // Skip on touch devices entirely.
+        ...(isMobile ? {} : { filter: "blur(8px)" }),
         ease:    "none",
         scrollTrigger: {
           trigger: nextCard,
@@ -205,7 +210,8 @@ export default function PainPoints() {
                 style={{
                   background: "rgba(6,13,31,0.92)",
                   border: `1px solid ${step.solution.color}25`,
-                  backdropFilter: "blur(20px)",
+                  // Remove backdropFilter on mobile — large sticky cards with blur = GPU overload
+                  ...(isMobile ? {} : { backdropFilter: "blur(20px)" }),
                   boxShadow: `0 30px 60px rgba(0,0,0,0.65), 0 0 80px ${step.solution.color}12`,
                 }}
               >

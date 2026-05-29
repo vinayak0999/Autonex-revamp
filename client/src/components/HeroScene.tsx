@@ -117,6 +117,11 @@ export default function HeroScene() {
       tl.from(ctaRef.current?.children ?? [], { y: 28, opacity: 0, scale: 0.9, duration: 0.55, stagger: 0.1, ease: EASE_BACK }, 1.15);
 
 
+      // Cache elements once — querySelectorAll on every scroll tick is expensive
+      const heroParallaxEls = sectionRef.current
+        ? sectionRef.current.querySelectorAll(".hero-parallax")
+        : null;
+
       // Parallax on scroll — hero text drifts up
       ScrollTrigger.create({
         trigger: sectionRef.current,
@@ -124,10 +129,8 @@ export default function HeroScene() {
         end: "bottom top",
         scrub: 1.5,
         onUpdate: (self) => {
-          if (!sectionRef.current) return;
-          const p = self.progress;
-          const textEls = sectionRef.current.querySelectorAll(".hero-parallax");
-          gsap.set(textEls, { y: p * 70 });
+          if (!heroParallaxEls) return;
+          gsap.set(heroParallaxEls, { y: self.progress * 70 });
         },
       });
     }, sectionRef);
@@ -159,10 +162,10 @@ export default function HeroScene() {
         {/* Deep space gradient */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(22,55,145,0.25) 0%, transparent 70%)", zIndex: 1 }} />
 
-        {/* Drifting aurora blobs */}
+        {/* Drifting aurora blobs — remove filter:blur on mobile (large blurred animated divs = expensive GPU texture) */}
         <div className="absolute pointer-events-none" style={{ inset: 0, overflow: "hidden", zIndex: 1 }}>
-          <div style={{ position: "absolute", top: "15%", left: "20%", width: "55vw", height: "55vw", borderRadius: "50%", background: "radial-gradient(circle, rgba(22,55,145,0.35) 0%, transparent 70%)", animation: "auroraShift 14s ease-in-out infinite", filter: "blur(60px)" }} />
-          <div style={{ position: "absolute", top: "40%", right: "10%", width: "35vw", height: "35vw", borderRadius: "50%", background: "radial-gradient(circle, rgba(98,170,222,0.18) 0%, transparent 70%)", animation: "auroraShift 18s ease-in-out infinite reverse", filter: "blur(50px)" }} />
+          <div style={{ position: "absolute", top: "15%", left: "20%", width: "55vw", height: "55vw", borderRadius: "50%", background: "radial-gradient(circle, rgba(22,55,145,0.35) 0%, transparent 70%)", animation: "auroraShift 14s ease-in-out infinite", filter: typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches ? undefined : "blur(60px)" }} />
+          <div style={{ position: "absolute", top: "40%", right: "10%", width: "35vw", height: "35vw", borderRadius: "50%", background: "radial-gradient(circle, rgba(98,170,222,0.18) 0%, transparent 70%)", animation: "auroraShift 18s ease-in-out infinite reverse", filter: typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches ? undefined : "blur(50px)" }} />
         </div>
 
         {/* Static noise texture — no animation to prevent blinking */}

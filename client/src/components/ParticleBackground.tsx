@@ -24,27 +24,31 @@ export const ParticleBackground = () => {
     let running = true;
     let lastFrameTime = 0;
     const mouse = { x: -9999, y: -9999 };
+    // Cache vw/vh — reading window.innerWidth/Height inside rAF triggers reflow
+    let cachedVW = window.innerWidth;
+    let cachedVH = window.innerHeight;
 
     let particles: Particle[] = [];
 
     // ─── Setup ────────────────────────────────────────────────────────────
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      canvas.width = vw * dpr;
-      canvas.height = vh * dpr;
-      canvas.style.width = `${vw}px`;
-      canvas.style.height = `${vh}px`;
+      cachedVW = window.innerWidth;
+      cachedVH = window.innerHeight;
+      canvas.width = cachedVW * dpr;
+      canvas.height = cachedVH * dpr;
+      canvas.style.width = `${cachedVW}px`;
+      canvas.style.height = `${cachedVH}px`;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
-      buildParticles(vw, vh);
+      buildParticles(cachedVW, cachedVH);
     };
 
     const buildParticles = (vw: number, vh: number) => {
       particles = [];
       const divisor = isMobile ? 18000 : 9000;
-      const count = Math.min(isMobile ? 120 : 350, Math.floor((vw * vh) / divisor));
+      // 70 particles on mobile (was 120) — fewer draw calls per frame
+      const count = Math.min(isMobile ? 70 : 350, Math.floor((vw * vh) / divisor));
       for (let i = 0; i < count; i++) {
         const x = Math.random() * vw;
         const y = Math.random() * vh;
@@ -64,15 +68,16 @@ export const ParticleBackground = () => {
     const animate = (ts = 0) => {
       if (!running) return;
 
-      // Throttle mobile to ~30fps
-      if (isMobile && ts - lastFrameTime < 33) {
+      // Throttle mobile to ~25 fps (40 ms) instead of 30 fps — easier on low-end GPUs
+      if (isMobile && ts - lastFrameTime < 40) {
         raf = requestAnimationFrame(animate);
         return;
       }
       lastFrameTime = ts;
 
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
+      // Use cached dimensions — avoids reflow on every animation frame
+      const vw = cachedVW;
+      const vh = cachedVH;
 
       // Clear with brand dark background — slightly deeper navy
       ctx.fillStyle = "rgba(3, 7, 18, 1)";

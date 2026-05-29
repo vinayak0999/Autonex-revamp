@@ -113,17 +113,22 @@ const BASE_CARD_H = 340;
 const STACK_OFFSET = 26; // px per layer, cards fan upper-right
 const AUTO_INTERVAL = 4200; // ms
 
-// Compute card dimensions that fit within available width, scaling STACK_OFFSET proportionally
+// Compute card dimensions that fit within available width.
+// On mobile we intentionally use a SMALL fixed offset (8 px) so:
+//   • cards are larger (≈332 px wide vs 281 px with the old proportional scaling)
+//   • visible slivers are only ~5 px wide — text fragments become invisible
 function calcDims(numCards: number) {
-  const maxOff = (numCards - 1) * STACK_OFFSET;
-  const padded = typeof window !== "undefined" ? window.innerWidth - 32 : BASE_CARD_W + maxOff;
-  const needed = BASE_CARD_W + maxOff;
-  if (padded >= needed) return { w: BASE_CARD_W, h: BASE_CARD_H, offset: STACK_OFFSET };
+  const isMob    = typeof window !== "undefined" && window.innerWidth < 640;
+  const stackOff = isMob ? 8 : STACK_OFFSET;   // 8 px on mobile, 26 px on desktop
+  const maxOff   = (numCards - 1) * stackOff;
+  const padded   = typeof window !== "undefined" ? window.innerWidth - 32 : BASE_CARD_W + maxOff;
+  const needed   = BASE_CARD_W + maxOff;
+  if (padded >= needed) return { w: BASE_CARD_W, h: BASE_CARD_H, offset: stackOff };
   const scale = padded / needed;
   return {
     w:      Math.floor(BASE_CARD_W * scale),
     h:      Math.floor(BASE_CARD_H * scale),
-    offset: Math.floor(STACK_OFFSET * scale),
+    offset: Math.floor(stackOff * scale),
   };
 }
 
@@ -322,7 +327,8 @@ export default function IndustriesScene() {
                     overflow: "hidden",
                     background: "rgba(6, 11, 24, 0.92)",
                     border: `1px solid ${ind.color}28`,
-                    backdropFilter: "blur(18px)",
+                    // Remove backdropFilter on mobile — 6 GPU blur layers = major scroll lag
+                    backdropFilter: dims.w < BASE_CARD_W ? undefined : "blur(18px)",
                     boxShadow: isFront
                       ? `0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px ${ind.color}18, 0 0 60px ${ind.glow}`
                       : "0 8px 24px rgba(0,0,0,0.35)",
