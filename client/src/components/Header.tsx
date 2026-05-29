@@ -106,7 +106,7 @@ export default function Header() {
       }`}
       style={{ top: 14 }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-3 items-center h-20">
           <div />
           <div className="flex items-center justify-center">

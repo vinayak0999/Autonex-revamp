@@ -135,7 +135,7 @@ function getCardStyle(pos: number, total: number, w: number, h: number, offset: 
     position: "absolute",
     width: w,
     height: h,
-    left: stackUpOnly ? 0 : fromFront * offset,  // mobile = pure vertical stack
+    left: fromFront * offset,  // mobile = pure vertical stack
     top:  -fromFront * offset,
     zIndex: pos + 1,
     opacity: 1 - fromFront * 0.1,
@@ -297,7 +297,7 @@ export default function IndustriesScene() {
           style={{
             paddingTop: maxOffset,
             // On mobile: cards stack upward only, no horizontal spread needed
-            paddingRight: dims.w < BASE_CARD_W ? 0 : maxOffset,
+            paddingRight: maxOffset,
             position: "relative",
           }}
         >
