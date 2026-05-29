@@ -113,29 +113,30 @@ const BASE_CARD_H = 340;
 const STACK_OFFSET = 26; // px per layer, cards fan upper-right
 const AUTO_INTERVAL = 4200; // ms
 
-// Compute card dimensions that fit within available width
+// Compute card dimensions that fit within available width, scaling STACK_OFFSET proportionally
 function calcDims(numCards: number) {
   const maxOff = (numCards - 1) * STACK_OFFSET;
   const padded = typeof window !== "undefined" ? window.innerWidth - 32 : BASE_CARD_W + maxOff;
   const needed = BASE_CARD_W + maxOff;
-  if (padded >= needed) return { w: BASE_CARD_W, h: BASE_CARD_H };
+  if (padded >= needed) return { w: BASE_CARD_W, h: BASE_CARD_H, offset: STACK_OFFSET };
   const scale = padded / needed;
   return {
-    w: Math.floor(BASE_CARD_W * scale),
-    h: Math.floor(BASE_CARD_H * scale),
+    w:      Math.floor(BASE_CARD_W * scale),
+    h:      Math.floor(BASE_CARD_H * scale),
+    offset: Math.floor(STACK_OFFSET * scale),
   };
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 /** pos=0 → back (most stacked), pos=N-1 → front (fully visible) */
-function getCardStyle(pos: number, total: number, w: number, h: number): CSSProperties {
+function getCardStyle(pos: number, total: number, w: number, h: number, offset: number): CSSProperties {
   const fromFront = total - 1 - pos; // 0 = front
   return {
     position: "absolute",
     width: w,
     height: h,
-    left: fromFront * STACK_OFFSET,
-    top: -fromFront * STACK_OFFSET,
+    left: fromFront * offset,
+    top:  -fromFront * offset,
     zIndex: pos + 1,
     opacity: 1 - fromFront * 0.1,
     cursor: "pointer",
@@ -159,7 +160,7 @@ export default function IndustriesScene() {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const maxOffset = (industries.length - 1) * STACK_OFFSET;
+  const maxOffset = (industries.length - 1) * dims.offset;
 
   // order[N-1] = front card index, order[0] = back card index
   const [order, setOrder] = useState(() => industries.map((_, i) => i));
@@ -315,7 +316,7 @@ export default function IndustriesScene() {
                   className="ind-card"
                   data-flip-id={`ind-${ind.id}`}
                   style={{
-                    ...getCardStyle(pos, order.length, dims.w, dims.h),
+                    ...getCardStyle(pos, order.length, dims.w, dims.h, dims.offset),
                     borderRadius: 20,
                     overflow: "hidden",
                     background: "rgba(6, 11, 24, 0.92)",

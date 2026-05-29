@@ -47,6 +47,8 @@ export default function GettingStarted() {
 
     // Build path AFTER layout so we know the actual pixel width
     requestAnimationFrame(() => {
+      // Skip SVG path animation on mobile — cards still animate in via scroll
+      if (window.innerWidth < 640) return;
       const W = svgEl.getBoundingClientRect().width;
       if (!W) return;
 
@@ -163,6 +165,7 @@ export default function GettingStarted() {
           <svg
             ref={svgRef}
             aria-hidden="true"
+            className="hidden sm:block"
             style={{
               position: "absolute",
               top: 0, left: 0,

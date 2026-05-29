@@ -3,14 +3,19 @@ import { Menu, X } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState, useEffect, useRef } from "react";
 import { gsap, EASE_POWER4 } from "@/lib/gsap";
+import { stopLenis, startLenis } from "@/lib/lenis";
 
 export default function Header() {
   const [, navigate] = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const headerRef = useRef<HTMLElement>(null);
-  const logoRef = useRef<HTMLImageElement>(null);
-  const menuBtnRef = useRef<HTMLButtonElement>(null);
+
+  const headerRef    = useRef<HTMLElement>(null);
+  const logoRef      = useRef<HTMLImageElement>(null);
+  const menuBtnRef   = useRef<HTMLButtonElement>(null);
+  // Menu DOM refs (always mounted — no conditional render = no flash)
+  const overlayRef   = useRef<HTMLDivElement>(null);
+  const scrimRef     = useRef<HTMLButtonElement>(null);
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const menuItemsRef = useRef<HTMLUListElement>(null);
 
@@ -25,51 +30,59 @@ export default function Header() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from(headerRef.current, {
-        y: -70,
-        opacity: 0,
-        duration: 0.9,
-        ease: EASE_POWER4,
-        delay: 0.1,
+        y: -70, opacity: 0, duration: 0.9, ease: EASE_POWER4, delay: 0.1,
       });
       gsap.from(logoRef.current, {
-        scale: 0.6,
-        opacity: 0,
-        duration: 0.9,
-        ease: "back.out(1.7)",
-        delay: 0.35,
+        scale: 0.6, opacity: 0, duration: 0.9, ease: "back.out(1.7)", delay: 0.35,
       });
       gsap.from(menuBtnRef.current, {
-        x: 30,
-        opacity: 0,
-        duration: 0.7,
-        ease: EASE_POWER4,
-        delay: 0.5,
+        x: 30, opacity: 0, duration: 0.7, ease: EASE_POWER4, delay: 0.5,
       });
     });
+
+    // ── Set initial state of the always-mounted menu overlay ──────────────
+    // This must happen synchronously in the mount effect so the overlay
+    // is invisible from frame 0 (no React-conditional-render flash).
+    if (overlayRef.current)   gsap.set(overlayRef.current,   { autoAlpha: 0, pointerEvents: "none" });
+    if (scrimRef.current)     gsap.set(scrimRef.current,     { opacity: 0 });
+    if (menuPanelRef.current) gsap.set(menuPanelRef.current, { x: "100%", opacity: 0 });
+
     return () => ctx.revert();
   }, []);
 
-  // Menu open/close animation
+  // ── Menu open / close animation (GSAP drives BOTH directions) ────────────
   useEffect(() => {
-    if (!menuPanelRef.current) return;
+    const overlay = overlayRef.current;
+    const scrim   = scrimRef.current;
+    const panel   = menuPanelRef.current;
+    const list    = menuItemsRef.current;
+    if (!overlay || !scrim || !panel) return;
+
     if (menuOpen) {
+      // ── OPEN ─────────────────────────────────────────────────────────────
+      stopLenis(); // prevent body scroll behind the overlay
+      gsap.set(overlay, { autoAlpha: 1, pointerEvents: "auto" });
+      gsap.to(scrim,  { opacity: 1, duration: 0.25, ease: "power2.out" });
       gsap.fromTo(
-        menuPanelRef.current,
+        panel,
         { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 0.45, ease: "power3.out" }
+        { x: "0%",   opacity: 1, duration: 0.45, ease: "power3.out" }
       );
-      // Stagger menu items
-      const items = menuItemsRef.current?.querySelectorAll("li");
-      if (items) {
-        gsap.from(items, {
-          x: 40,
-          opacity: 0,
-          duration: 0.45,
-          stagger: 0.08,
-          ease: "power3.out",
-          delay: 0.2,
+      if (list) {
+        gsap.from(list.querySelectorAll("li"), {
+          x: 40, opacity: 0, duration: 0.4, stagger: 0.08, ease: "power3.out", delay: 0.18,
         });
       }
+    } else {
+      // ── CLOSE ────────────────────────────────────────────────────────────
+      gsap.to(scrim, { opacity: 0, duration: 0.25, ease: "power2.in" });
+      gsap.to(panel, {
+        x: "100%", opacity: 0, duration: 0.35, ease: "power3.in",
+        onComplete: () => {
+          gsap.set(overlay, { autoAlpha: 0, pointerEvents: "none" });
+          startLenis(); // re-enable body scroll after overlay is gone
+        },
+      });
     }
   }, [menuOpen]);
 
@@ -77,10 +90,7 @@ export default function Header() {
     setMenuOpen(false);
     if (window.location.pathname === "/") {
       const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-        return;
-      }
+      if (element) { element.scrollIntoView({ behavior: "smooth" }); return; }
     }
     navigate(`/#${sectionId}`);
   };
@@ -130,79 +140,85 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Quarter-circle menu */}
-      {menuOpen && (
-        <div className="fixed inset-0 z-[60]">
-          {/* Scrim */}
-          <button
-            aria-label="Close menu overlay"
-            onClick={() => setMenuOpen(false)}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-          />
-          {/* Panel */}
-          <div className="pointer-events-none absolute top-0 right-0 w-[85vw] max-w-[520px] aspect-square overflow-hidden rounded-bl-[100%]">
-            <div
-              ref={menuPanelRef}
-              className="pointer-events-auto absolute inset-0 text-white shadow-2xl flex flex-col"
-              style={{
-                background: "rgba(6,13,31,0.92)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(98,170,222,0.2)",
-              }}
-            >
-              <div className="p-3 self-end">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Close menu"
-                  className="h-11 w-11"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <X className="h-7 w-7" />
-                </Button>
-              </div>
-              <nav className="flex-1 overflow-y-auto p-8 pt-10 pr-12 pl-32 md:pl-40 lg:pl-44">
-                <ul ref={menuItemsRef} className="space-y-3">
-                  <li className="ml-0 md:ml-2">
-                    <Button
-                      variant="ghost"
-                      className="justify-start w-full text-lg nav-item-hover"
-                      onClick={() => handleNavClick("home")}
-                    >
-                      Home
-                    </Button>
-                  </li>
-                  <li className="ml-6 md:ml-8">
-                    <Button
-                      variant="ghost"
-                      className="justify-start w-full text-lg nav-item-hover"
-                      onClick={() => goToTopAndClose("/products")}
-                    >
-                      Products
-                    </Button>
-                  </li>
-                  <li className="ml-10 md:ml-14">
-                    <Button
-                      variant="ghost"
-                      className="justify-start w-full text-lg nav-item-hover"
-                      onClick={() => goToTopAndClose("/about")}
-                    >
-                      About
-                    </Button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </div>
+      {/* ── Menu overlay — ALWAYS MOUNTED, GSAP controls visibility ────────── */}
+      {/* No conditional rendering = no React-mount-frame flash              */}
+      <div
+        ref={overlayRef}
+        className="fixed inset-0 z-[60]"
+        aria-hidden={!menuOpen}
+      >
+        {/* Scrim — solid background, no backdrop-blur (avoids GPU repaint) */}
+        <button
+          ref={scrimRef}
+          aria-label="Close menu overlay"
+          onClick={() => setMenuOpen(false)}
+          className="absolute inset-0 bg-black/50"
+          style={{ opacity: 0, border: "none", cursor: "pointer" }}
+        />
 
-          <style>{`
-            .nav-item-hover:hover {
-              background-color: rgba(98,170,222,0.1) !important;
-              color: #62AADE !important;
-            }
-          `}</style>
+        {/* Quarter-circle panel */}
+        <div className="pointer-events-none absolute top-0 right-0 w-[85vw] max-w-[520px] aspect-square overflow-hidden rounded-bl-[100%]">
+          <div
+            ref={menuPanelRef}
+            className="pointer-events-auto absolute inset-0 text-white shadow-2xl flex flex-col"
+            style={{
+              background: "rgba(6,13,31,0.95)",
+              backdropFilter: "blur(20px)",
+              border: "1px solid rgba(98,170,222,0.2)",
+            }}
+          >
+            <div className="p-3 self-end">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Close menu"
+                className="h-11 w-11"
+                onClick={() => setMenuOpen(false)}
+              >
+                <X className="h-7 w-7" />
+              </Button>
+            </div>
+            <nav className="flex-1 overflow-y-auto p-8 pt-10 pr-12 pl-32 md:pl-40 lg:pl-44">
+              <ul ref={menuItemsRef} className="space-y-3">
+                <li className="ml-0 md:ml-2">
+                  <Button
+                    variant="ghost"
+                    className="justify-start w-full text-lg nav-item-hover"
+                    onClick={() => handleNavClick("home")}
+                  >
+                    Home
+                  </Button>
+                </li>
+                <li className="ml-6 md:ml-8">
+                  <Button
+                    variant="ghost"
+                    className="justify-start w-full text-lg nav-item-hover"
+                    onClick={() => goToTopAndClose("/products")}
+                  >
+                    Products
+                  </Button>
+                </li>
+                <li className="ml-10 md:ml-14">
+                  <Button
+                    variant="ghost"
+                    className="justify-start w-full text-lg nav-item-hover"
+                    onClick={() => goToTopAndClose("/about")}
+                  >
+                    About
+                  </Button>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
-      )}
+      </div>
+
+      <style>{`
+        .nav-item-hover:hover {
+          background-color: rgba(98,170,222,0.1) !important;
+          color: #62AADE !important;
+        }
+      `}</style>
     </header>
   );
 }

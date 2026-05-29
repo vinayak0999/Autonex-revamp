@@ -20,9 +20,9 @@ export function initLenis() {
     window.matchMedia?.("(pointer: coarse)").matches ?? false;
 
   lenis = new Lenis({
-    // ── Feel tuning ──────────────────────────────────────────────────────
-    // 1.5 = silky smooth, cinematic. Shorter on mobile to prevent rubber-band.
-    duration: prefersReducedMotion ? 0 : isMobile ? 1.0 : 1.5,
+    // ── Feel tuning ───────────────────────────────────────────────────────
+    // Shorter on mobile so the scroll settles faster on lower-end devices
+    duration: prefersReducedMotion ? 0 : isMobile ? 0.9 : 1.5,
 
     // Custom expo-out easing — starts fast, rests perfectly still
     easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -30,8 +30,8 @@ export function initLenis() {
     // Smooth wheel input across browsers
     smoothWheel: true as any,
 
-    // Native momentum feels better on iOS — keep touch native
-    smoothTouch: false as any,
+    // Enable Lenis-managed touch scroll on mobile for GSAP sync
+    smoothTouch: true as any,
 
     // Normalize mouse-wheel delta for consistent cross-browser speed
     normalizeWheel: true as any,
@@ -64,6 +64,16 @@ export function destroyLenis() {
     lenis.destroy();
     lenis = null;
   }
+}
+
+/** Pause Lenis (use when a modal/menu overlay is open) */
+export function stopLenis() {
+  lenis?.stop();
+}
+
+/** Resume Lenis (use when modal/menu overlay closes) */
+export function startLenis() {
+  lenis?.start();
 }
 
 /** Smooth-scroll to a target element, route hash, or pixel offset */
