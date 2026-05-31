@@ -114,13 +114,60 @@ export default function ServicesScene() {
   const enteredRef    = useRef(false);
 
   const [active, setActive] = useState(0);
+  // Tracks videos that can't be played: unsupported format (.mov on Android) or load error.
+  // These fall back to the "coming soon" placeholder.
+  const [videoErrors, setVideoErrors] = useState<Set<number>>(new Set());
 
-  // ── Play the right video ──────────────────────────────────────────────────
+  // ── Pre-detect unsupported formats before any network request ──────────────────
+  // .mov (QuickTime) works only in Safari/iOS. Android Chrome, Samsung Internet,
+  // and Firefox do NOT support it — canPlayType returns "" (empty = unsupported).
+  useEffect(() => {
+    const testVid = document.createElement('video');
+    const errSet = new Set<number>();
+    PRODUCTS.forEach((prod, i) => {
+      if (!prod.video) return;
+      const ext = prod.video.toLowerCase().split('.').pop();
+      if (ext === 'mov') {
+        // canPlayType returns: "probably" | "maybe" | "" (empty = not supported)
+        if (testVid.canPlayType('video/quicktime') === '') errSet.add(i);
+      } else if (ext === 'mp4') {
+        if (testVid.canPlayType('video/mp4') === '') errSet.add(i);
+      }
+    });
+    if (errSet.size > 0) setVideoErrors(errSet);
+  }, []);
+
+  // ── Robust video playback with readyState guard ────────────────────────────
+  // Edge cases handled:
+  //   • readyState < 2 (HAVE_NOTHING / HAVE_METADATA): wait for 'canplay' before seeking
+  //   • iOS Low Power Mode: play() Promise rejection is caught and ignored
+  //   • preload="none": triggers v.load() to start network fetch before playing
   const playVideo = useCallback((idx: number) => {
     videoRefs.current.forEach((v, i) => {
       if (!v) return;
-      if (i === idx) { v.currentTime = 0; v.play().catch(() => {}); }
-      else v.pause();
+      if (i === idx) {
+        // If browser hasn't started fetching (preload=none or network idle), kick it off
+        if (v.readyState === 0) {
+          v.preload = 'auto';
+          v.load();
+        }
+        const doPlay = () => {
+          v.currentTime = 0;
+          v.play().catch(() => {
+            // Non-fatal: browser policy (Low Power Mode, autoplay restrictions)
+            // Muted videos should always be allowed — but some iOS versions block anyway
+          });
+        };
+        // readyState >= 2 (HAVE_CURRENT_DATA): enough data to seek + play immediately
+        if (v.readyState >= 2) {
+          doPlay();
+        } else {
+          // Wait for the browser to buffer enough — prevents black-frame stall on mobile
+          v.addEventListener('canplay', doPlay, { once: true });
+        }
+      } else {
+        v.pause();
+      }
     });
   }, []);
 
@@ -524,35 +571,56 @@ export default function ServicesScene() {
                   style={{ background: "linear-gradient(148deg, rgba(255,255,255,0.05) 0%, transparent 35%)" }}
                 />
 
-                {/* Videos */}
-                {PRODUCTS.map((prod, vi) =>
-                  prod.video ? (
+                {/* Videos — all rendered but only active one visible.
+                   Edge-case handling:
+                   • .mov on Android: detected via canPlayType on mount, falls through to placeholder
+                   • Runtime load error: onError adds index to videoErrors, shows placeholder
+                   • <source> with type: browser skips incompatible codec without downloading
+                   • preload="metadata": loads first frame only, enables faster play() start */}
+                {PRODUCTS.map((prod, vi) => {
+                  const isActive = vi === active;
+                  // Show placeholder if format unsupported or video failed to load
+                  const canShow = prod.video && !videoErrors.has(vi);
+
+                  return canShow ? (
                     <video
                       key={prod.id}
                       ref={el => { videoRefs.current[vi] = el; }}
-                      src={prod.video}
                       loop muted playsInline
-                      className={`absolute inset-0 w-full h-full ${prod.id === "vigil" ? "object-contain bg-black" : "object-cover"}`}
-                      style={{ opacity: vi === active ? 1 : 0, transition: "opacity 0.3s ease", zIndex: 5 }}
-                    />
+                      preload="metadata"
+                      onError={() => {
+                        // Runtime failure (404, codec mismatch, network error) — fall back to placeholder
+                        setVideoErrors(prev => new Set([...prev, vi]));
+                      }}
+                      className={`absolute inset-0 w-full h-full ${
+                        prod.id === 'vigil' ? 'object-contain bg-black' : 'object-cover'
+                      }`}
+                      style={{ opacity: isActive ? 1 : 0, transition: 'opacity 0.3s ease', zIndex: 5 }}
+                    >
+                      {/* Explicit MIME type so browser skips incompatible formats without downloading */}
+                      <source
+                        src={prod.video}
+                        type={prod.video.endsWith('.mov') ? 'video/quicktime' : 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'}
+                      />
+                    </video>
                   ) : (
                     <div
                       key={prod.id}
                       className="absolute inset-0 flex flex-col items-center justify-center"
                       style={{
-                        opacity: vi === active ? 1 : 0,
-                        transition: "opacity 0.3s ease",
+                        opacity: isActive ? 1 : 0,
+                        transition: 'opacity 0.3s ease',
                         zIndex: 5,
                         background: `radial-gradient(ellipse at center, ${prod.color}10 0%, transparent 70%)`,
                       }}
                     >
                       <p className="text-[10px] font-black tracking-[0.22em] uppercase"
-                         style={{ color: "rgba(255,255,255,0.18)" }}>
+                         style={{ color: 'rgba(255,255,255,0.18)' }}>
                         Video coming soon
                       </p>
                     </div>
-                  )
-                )}
+                  );
+                })}
 
                 {/* Glitch overlay */}
                 <div
