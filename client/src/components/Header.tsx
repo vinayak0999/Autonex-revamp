@@ -26,12 +26,17 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll as any);
   }, []);
 
-  // Header entrance animation on mount
+  // Header entrance — CSS animation on the element itself (never blocked by React/JS)
+  // Logo + menuBtn still use GSAP (simpler, less critical)
   useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+
+    // Clear any stuck GSAP inline styles from hot-reload / previous renders
+    gsap.set([el, logoRef.current, menuBtnRef.current], { clearProps: "all" });
+
+    // Logo + menuBtn GSAP animations (low risk, not critical)
     const ctx = gsap.context(() => {
-      gsap.from(headerRef.current, {
-        y: -70, opacity: 0, duration: 0.9, ease: EASE_POWER4, delay: 0.1,
-      });
       gsap.from(logoRef.current, {
         scale: 0.6, opacity: 0, duration: 0.9, ease: "back.out(1.7)", delay: 0.35,
       });
@@ -40,8 +45,12 @@ export default function Header() {
       });
     });
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      gsap.set([logoRef.current, menuBtnRef.current], { clearProps: "all" });
+    };
   }, []);
+
 
   // ── Menu open / close animation (GSAP drives BOTH directions) ────────────
   useEffect(() => {
@@ -104,7 +113,7 @@ export default function Header() {
       className={`fixed left-0 right-0 z-50 transition-all duration-300 ${
         scrolled ? "bg-background/80 backdrop-blur-md border-b border-border" : "bg-transparent"
       }`}
-      style={{ top: 14 }}
+      style={{ top: 14, animation: "headerEntrance 0.85s cubic-bezier(0.22,1,0.36,1) 0.08s both" }}
     >
       <div className="max-w-7xl mx-auto px-10 sm:px-6 lg:px-8">
         <div className="grid grid-cols-3 items-center h-20">
@@ -210,6 +219,10 @@ export default function Header() {
       </div>
 
       <style>{`
+        @keyframes headerEntrance {
+          from { transform: translateY(-64px); opacity: 0; }
+          to   { transform: translateY(0px);  opacity: 1; }
+        }
         .nav-item-hover:hover {
           background-color: rgba(98,170,222,0.1) !important;
           color: #62AADE !important;

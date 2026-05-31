@@ -62,7 +62,8 @@ const PRODUCTS = [
     headline: "More output. Zero new machines.\nOne click to approve.",
     tagline:  "A virtual replica of your factory, running simulations in real time, scoring hundreds of scenarios, and telling you exactly what to change to unlock hidden capacity.",
     subtext:  "",
-    video:    "/videos/twin.mov",
+    video:    "/videos/twin.mp4",
+
     quickWin: "POC in 6-8 weeks",
     features: [
       "Mirror your shop floor. Precise virtual model built using your live machine data.",
@@ -85,7 +86,8 @@ const PRODUCTS = [
     headline: "",
     tagline:  "Eliminate manual entry. Pull a full audit package in minutes, not days.",
     subtext:  "",
-    video:    "/videos/ebmr.mov",
+    video:    "/videos/ebmr.mp4",
+
     quickWin: "Dispatch live in 1 day",
     features: [
       "Auto-capture via cameras & sensors. No paper.",
@@ -118,26 +120,7 @@ export default function ServicesScene() {
   // These fall back to the "coming soon" placeholder.
   const [videoErrors, setVideoErrors] = useState<Set<number>>(new Set());
 
-  // ── Pre-detect unsupported formats before any network request ──────────────────
-  // .mov (QuickTime) works only in Safari/iOS. Android Chrome, Samsung Internet,
-  // and Firefox do NOT support it — canPlayType returns "" (empty = unsupported).
-  useEffect(() => {
-    const testVid = document.createElement('video');
-    const errSet = new Set<number>();
-    PRODUCTS.forEach((prod, i) => {
-      if (!prod.video) return;
-      const ext = prod.video.toLowerCase().split('.').pop();
-      if (ext === 'mov') {
-        // canPlayType returns: "probably" | "maybe" | "" (empty = not supported)
-        if (testVid.canPlayType('video/quicktime') === '') errSet.add(i);
-      } else if (ext === 'mp4') {
-        if (testVid.canPlayType('video/mp4') === '') errSet.add(i);
-      }
-    });
-    if (errSet.size > 0) setVideoErrors(errSet);
-  }, []);
 
-  // ── Robust video playback with readyState guard ────────────────────────────
   // Edge cases handled:
   //   • readyState < 2 (HAVE_NOTHING / HAVE_METADATA): wait for 'canplay' before seeking
   //   • iOS Low Power Mode: play() Promise rejection is caught and ignored
@@ -588,20 +571,14 @@ export default function ServicesScene() {
                       ref={el => { videoRefs.current[vi] = el; }}
                       loop muted playsInline
                       preload="metadata"
-                      onError={() => {
-                        // Runtime failure (404, codec mismatch, network error) — fall back to placeholder
-                        setVideoErrors(prev => new Set([...prev, vi]));
-                      }}
+                      onError={() => setVideoErrors(prev => new Set([...prev, vi]))}
                       className={`absolute inset-0 w-full h-full ${
                         prod.id === 'vigil' ? 'object-contain bg-black' : 'object-cover'
                       }`}
                       style={{ opacity: isActive ? 1 : 0, transition: 'opacity 0.3s ease', zIndex: 5 }}
                     >
-                      {/* Explicit MIME type so browser skips incompatible formats without downloading */}
-                      <source
-                        src={prod.video}
-                        type={prod.video.endsWith('.mov') ? 'video/quicktime' : 'video/mp4; codecs="avc1.42E01E, mp4a.40.2"'}
-                      />
+                      {/* .mp4 with codec hint — plays on all devices */}
+                      <source src={prod.video} type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
                     </video>
                   ) : (
                     <div
