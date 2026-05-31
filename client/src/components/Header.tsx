@@ -47,7 +47,9 @@ export default function Header() {
 
     return () => {
       ctx.revert();
-      gsap.set([logoRef.current, menuBtnRef.current], { clearProps: "all" });
+      // Guard against null refs during unmount (React nulls refs before cleanup runs)
+      if (logoRef.current)    gsap.set(logoRef.current,    { clearProps: "all" });
+      if (menuBtnRef.current) gsap.set(menuBtnRef.current, { clearProps: "all" });
     };
   }, []);
 
