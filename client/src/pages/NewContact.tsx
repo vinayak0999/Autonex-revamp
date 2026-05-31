@@ -513,13 +513,13 @@ export default function NewContact() {
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-[radial-gradient(60%_100%_at_50%_100%,hsl(220, 73%, 33%, 0.15),transparent_70%)]" />
 
               <motion.div
-                className="relative z-10 max-w-5xl mx-auto px-6 text-center text-white"
+                className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 text-center text-white"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="relative mx-auto p-10 md:p-14">
+                <div className="relative mx-auto w-full px-4 sm:px-8 md:px-14 py-10 md:py-14">
                   <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4 text-white">
                     Stay <span className="text-secondary">Updated</span>
                   </h2>
@@ -543,13 +543,13 @@ export default function NewContact() {
                     </div>
                   </div>
 
-                  <div className="flex w-full max-w-md mx-auto items-center space-x-2">
+                  <div className="flex flex-col xs:flex-row w-full max-w-md mx-auto items-stretch gap-2">
                     <input
                       type="email"
                       placeholder="Enter your email"
                       className="flex-grow bg-zinc-900/70 backdrop-blur-sm border border-secondary/40 rounded-lg px-4 py-3 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-secondary/70 focus:border-secondary/70 shadow-xl focus:shadow-2xl transition-all duration-300"
                     />
-                    <button className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105">
+                    <button className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-6 py-3 rounded-lg font-medium transition-all duration-300 shadow-xl hover:shadow-2xl hover:scale-105 whitespace-nowrap">
                       Subscribe
                     </button>
                   </div>

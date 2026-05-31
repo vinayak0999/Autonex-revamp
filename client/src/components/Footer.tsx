@@ -287,10 +287,10 @@ export default function Footer({ hideCta = false }: { hideCta?: boolean }) {
                   textShadow:    "0 0 60px rgba(98,170,222,0.18), 0 0 20px rgba(22,55,145,0.12)",
                 }}
               >
-                <span style={{ display: "block", fontSize: "clamp(2rem, 6.5vw, 7rem)", whiteSpace: "nowrap" }}>
+                <span style={{ display: "block", fontSize: "clamp(2rem, 6.5vw, 7rem)" }}>
                   LET&apos;S GET STARTED
                 </span>
-                <span style={{ display: "block", fontSize: "clamp(2rem, 6.5vw, 7rem)", letterSpacing: "0.06em", whiteSpace: "nowrap" }}>
+                <span style={{ display: "block", fontSize: "clamp(2rem, 6.5vw, 7rem)", letterSpacing: "0.06em" }}>
                   TOGETHER
                 </span>
               </h2>

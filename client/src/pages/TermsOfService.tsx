@@ -61,7 +61,7 @@ const sections = [
   },
   {
     title: "15. Contact",
-    content: `If you have any questions about these Terms, please contact us at:\n\nAutonex AI\nEmail: legal@autonexai360.com\nWebsite: www.autonexai360.com`,
+    content: `If you have any questions about these Terms, please contact us at:\n\nAutonex AI\nEmail: query@autonexai360.com\nWebsite: www.autonexai360.com`,
   },
 ];
 

@@ -106,7 +106,7 @@ Essential cookies cannot be disabled as they are required for the Services to fu
 
 Autonex AI Pvt. Ltd.
 Attn: Privacy Team
-Email: privacy@autonexai360.com
+Email: query@autonexai360.com
 General: nikhilg@autonexai360.com
 Website: www.autonexai360.com
 

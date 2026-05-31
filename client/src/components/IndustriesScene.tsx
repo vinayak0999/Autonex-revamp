@@ -335,9 +335,11 @@ export default function IndustriesScene() {
                     // Remove backdropFilter on mobile — 6 GPU blur layers = major scroll lag
                     backdropFilter: dims.w < BASE_CARD_W ? undefined : "blur(18px)",
                     boxShadow: isFront
-                      ? `0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px ${ind.color}18, 0 0 60px ${ind.glow}`
-                      : "0 8px 24px rgba(0,0,0,0.35)",
-                    transition: "box-shadow 0.3s ease",
+                      ? `0 20px 50px rgba(0,0,0,0.5), 0 0 0 1px ${ind.color}18, 0 0 40px ${ind.glow}`
+                      : "0 6px 20px rgba(0,0,0,0.3)",
+                    // will-change promotes card to its own compositor layer —
+                    // prevents box-shadow / opacity changes from repainting siblings
+                    willChange: "transform",
                   }}
                 >
                   {/* Accent bar top */}
@@ -375,7 +377,8 @@ export default function IndustriesScene() {
                       <div style={{ textAlign: "right", flexShrink: 0 }}>
                         <div style={{
                           fontSize: 36, fontWeight: 900, color: ind.color, lineHeight: 1,
-                          filter: `drop-shadow(0 0 10px ${ind.color}70)`,
+                          // drop-shadow is expensive on mobile — skip it
+                          filter: dims.w >= BASE_CARD_W ? `drop-shadow(0 0 10px ${ind.color}70)` : undefined,
                         }}>
                           {ind.stat}
                         </div>

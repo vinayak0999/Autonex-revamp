@@ -65,6 +65,7 @@ export default function Header() {
     if (menuOpen) {
       // ── OPEN ────────────────────────────────────────────────────
       stopLenis();
+      overlay.removeAttribute("inert"); // allow focus inside the menu
       gsap.set(overlay, { visibility: "visible", pointerEvents: "auto" });
       gsap.to(scrim, { opacity: 1, duration: 0.25, ease: "power2.out" });
       // fromTo ensures GSAP doesn't rely on reading CSS transform
@@ -79,6 +80,11 @@ export default function Header() {
       }
     } else {
       // ── CLOSE ────────────────────────────────────────────────────────────
+      // Move focus OUT of the overlay before aria-hidden is set — prevents the
+      // "Blocked aria-hidden on element because its descendant retained focus" warning.
+      // inert prevents focus from entering the overlay while it's animating out.
+      overlay.setAttribute("inert", "");
+      menuBtnRef.current?.focus({ preventScroll: true });
       gsap.to(scrim, { opacity: 0, duration: 0.25, ease: "power2.in" });
       gsap.to(panel, {
         x: "100%", opacity: 0, duration: 0.35, ease: "power3.in",
